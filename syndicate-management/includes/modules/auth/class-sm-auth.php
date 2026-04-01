@@ -97,6 +97,8 @@ class SM_Auth {
             </div>';
         }
         $user = wp_get_current_user();
+        $member = SM_DB::get_member_by_wp_user_id($user->ID);
+        $member_id = $member ? $member->id : 0;
         $is_restricted = !current_user_can('sm_branch_access') && !current_user_can('sm_full_access');
         $dashboard_url = $is_restricted ? home_url('/my-account') : home_url('/dashboard');
 
@@ -151,7 +153,7 @@ class SM_Auth {
                         }
                     }
                     if ($unread_msgs > 0): ?>
-                        <span class="sm-icon-badge" style="position:absolute; top:-4px; right:-4px; background:#e53e3e; color:#fff; font-size:9px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; font-weight:800;"><?php echo $unread_msgs; ?></span>
+                        <span class="sm-icon-badge" style="position:absolute; top:-2px; right:-2px; background:#e53e3e; color:#fff; font-size:8px; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; font-weight:800;"><?php echo $unread_msgs; ?></span>
                     <?php endif; ?>
                 </a>
 
@@ -172,7 +174,7 @@ class SM_Auth {
                             ];
                         }
                         if (count($notif_alerts) > 0): ?>
-                            <span id="sm-notif-count" class="sm-icon-badge" style="position:absolute; top:-4px; right:-4px; background:#f6ad55; color:#fff; font-size:9px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; font-weight:800;"><?php echo count($notif_alerts); ?></span>
+                            <span id="sm-notif-count" class="sm-icon-badge" style="position:absolute; top:-2px; right:-2px; background:#e53e3e; color:#fff; font-size:8px; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; font-weight:800;"><?php echo count($notif_alerts); ?></span>
                         <?php endif; ?>
                     </a>
                     <div id="sm-notifications-menu" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 100000; padding: 20px; text-align:right;">
@@ -222,9 +224,11 @@ class SM_Auth {
 
                     <div id="sm-profile-view">
                         <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; background: #fcfcfc; display: flex; align-items: center; gap: 15px;">
-                            <div id="sm-dropdown-avatar" style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink:0;">
+                            <div id="sm-dropdown-avatar" style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink:0; position:relative; cursor:pointer;" onclick="document.getElementById('sm_profile_photo_input').click()" title="تغيير الصورة الشخصية">
                                 <?php echo get_avatar($user->ID, 55, '', '', array('style' => 'width: 100%; height: 100%; object-fit: cover;')); ?>
+                                <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.5); color:#fff; font-size:8px; text-align:center; padding:2px 0; opacity:0; transition:0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">تعديل</div>
                             </div>
+                            <input type="file" id="sm_profile_photo_input" style="display:none;" accept="image/*" onchange="smUploadProfilePhoto(this)">
                             <div style="flex:1;">
                                 <div style="font-weight: 900; color: var(--sm-dark-color); font-size:1.1em;"><?php echo $user->display_name; ?></div>
                                 <div style="font-size: 11px; color: #718096; word-break: break-all; margin-top:2px;"><?php echo $user->user_email; ?></div>
@@ -321,7 +325,47 @@ class SM_Auth {
                 const topbar = document.getElementById('sm-topbar-avatar');
                 const dropdown = document.getElementById('sm-dropdown-avatar');
                 if (topbar) topbar.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-                if (dropdown) dropdown.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                if (dropdown) {
+                    const img = dropdown.querySelector('img');
+                    if (img) img.src = url;
+                    else dropdown.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">` + dropdown.innerHTML;
+                }
+            };
+            window.smUploadProfilePhoto = function(input) {
+                if (!input.files || !input.files[0]) return;
+                const mid = <?php echo intval($member_id); ?>;
+                if (!mid) {
+                    alert('لا يمكن تحديث الصورة: لم يتم العثور على ملف عضوية مرتبطة');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('action', 'sm_update_member_photo');
+                formData.append('member_id', mid);
+                formData.append('member_photo', input.files[0]);
+                formData.append('sm_photo_nonce', '<?php echo wp_create_nonce("sm_photo_action"); ?>');
+
+                const avatarWrap = document.getElementById('sm-dropdown-avatar');
+                avatarWrap.style.opacity = '0.5';
+
+                fetch(ajaxurl + '?action=sm_update_member_photo', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(res => {
+                    avatarWrap.style.opacity = '1';
+                    if (res.success) {
+                        smUpdateShortcodeAvatar(res.data.photo_url);
+                        if (typeof smShowNotification === 'function') smShowNotification('تم تحديث الصورة الشخصية بنجاح');
+                    } else {
+                        alert('فشل تحديث الصورة: ' + (res.data && res.data.message ? res.data.message : 'خطأ غير معروف'));
+                    }
+                })
+                .catch(err => {
+                    avatarWrap.style.opacity = '1';
+                    alert('خطأ في الاتصال أثناء رفع الصورة');
+                });
             };
             window.smDismissAlert = function(id) {
                 const item = document.getElementById('sm-alert-item-' + id);

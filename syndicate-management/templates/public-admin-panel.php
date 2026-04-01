@@ -1091,11 +1091,17 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                         // Integrated System Alerts
                         $sys_alerts = SM_DB::get_active_alerts_for_user($user->ID);
                         foreach($sys_alerts as $sa) {
-                            $notif_alerts[] = ['text' => $sa->title, 'type' => 'system', 'id' => $sa->id, 'details' => $sa->message];
+                            $notif_alerts[] = [
+                                'text' => $sa->title,
+                                'type' => 'system',
+                                'id' => $sa->id,
+                                'details' => $sa->message,
+                                'target_url' => $sa->target_url ?? ''
+                            ];
                         }
 
                         if (count($notif_alerts) > 0): ?>
-                            <span class="sm-icon-badge" style="background: #f6ad55;"><?php echo count($notif_alerts); ?></span>
+                            <span id="sm-notif-count" class="sm-icon-badge" style="background: #e53e3e;"><?php echo count($notif_alerts); ?></span>
                         <?php endif; ?>
                     </a>
                     <div id="sm-notifications-menu" style="display: none; position: absolute; top: 150%; left: 0; background: white; border: 1px solid var(--sm-border-color); border-radius: 8px; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; padding: 15px; text-align:right;">
@@ -1110,18 +1116,17 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                                 <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
                             <?php else: ?>
                                 <?php foreach ($notif_alerts as $a): ?>
-                                    <div id="sm-alert-item-<?php echo intval($a['id'] ?? 0); ?>" style="font-size: 12px; padding: 8px; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 8px; align-items: flex-start; position: relative;">
+                                    <div id="sm-alert-item-<?php echo intval($a['id'] ?? 0); ?>" style="font-size: 12px; padding: 10px 0; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 12px; align-items: flex-start; position: relative;">
                                         <span class="dashicons <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
-                                        <span style="flex: 1;">
-                                            <strong style="display:block; margin-bottom:2px;"><?php echo esc_html($a['text']); ?></strong>
-                                            <?php if(isset($a['type']) && $a['type'] == 'system'): ?>
-                                                <div style="font-size:10px; color:#718096; margin-bottom:5px;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 80, "...")); ?></div>
-                                                <a href="javascript:smAcknowledgeAlert(<?php echo intval($a['id']); ?>)" style="font-size:10px; color:var(--sm-primary-color); font-weight:700;">إقرار واستمرار</a>
+                                        <span style="flex: 1; cursor: pointer;" onclick="smAcknowledgeAlert(<?php echo intval($a['id'] ?? 0); ?>, '<?php echo esc_js($a['target_url'] ?? ''); ?>')">
+                                            <strong style="display:block; margin-bottom:4px; color:var(--sm-dark-color);"><?php echo esc_html($a['text']); ?></strong>
+                                            <?php if(!empty($a['details'])): ?>
+                                                <div style="font-size:10px; color:#718096; margin-bottom:8px; line-height:1.5;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 100, "...")); ?></div>
                                             <?php endif; ?>
                                         </span>
                                         <?php if(isset($a['id'])): ?>
-                                            <a href="javascript:smDismissAlert(<?php echo intval($a['id']); ?>)" style="color: #cbd5e0; text-decoration: none;" title="حذف">
-                                                <span class="dashicons dashicons-no-alt" style="font-size: 14px; width: 14px; height: 14px;"></span>
+                                            <a href="javascript:smDismissAlert(<?php echo intval($a['id']); ?>)" style="color: #cbd5e0; text-decoration: none; margin-right: 5px;" title="حذف">
+                                                <span class="dashicons dashicons-no-alt" style="font-size: 16px; width: 16px; height: 16px;"></span>
                                             </a>
                                         <?php endif; ?>
                                     </div>

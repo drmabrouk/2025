@@ -465,6 +465,10 @@ class SM_DB {
         return SM_DB_System::dismiss_alert($aid, $uid);
     }
 
+    public static function dismiss_all_alerts($uid) {
+        return SM_DB_System::dismiss_all_alerts($uid);
+    }
+
     public static function get_branches_data($args = []) {
         return SM_DB_System::get_branches_data($args);
     }

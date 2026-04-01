@@ -303,10 +303,21 @@ class SM_DB_Members {
         if (username_exists($national_id)) {
             $existing_user = get_user_by('login', $national_id);
             $wp_user_id = $existing_user->ID;
+
+            // Update email if it's different and not a conflict
+            if ($email && $email !== $existing_user->user_email && !email_exists($email)) {
+                wp_update_user(['ID' => $wp_user_id, 'user_email' => $email]);
+            }
         } else {
+            $target_email = $email ?: $national_id . '@irseg.org';
+            // Conflict resolution for email
+            if (email_exists($target_email)) {
+                $target_email = $national_id . '.' . time() . '@irseg.org';
+            }
+
             $wp_user_id = wp_insert_user(array(
                 'user_login' => $national_id,
-                'user_email' => $email ?: $national_id . '@irseg.org',
+                'user_email' => $target_email,
                 'display_name' => $name,
                 'user_pass' => '', // Account needs activation/password set
                 'role' => 'sm_member'
@@ -317,8 +328,19 @@ class SM_DB_Members {
             if (!empty($data['governorate'])) {
                 update_user_meta($wp_user_id, 'sm_governorate', sanitize_text_field($data['governorate']));
             }
+            update_user_meta($wp_user_id, 'sm_account_status', 'active');
+            update_user_meta($wp_user_id, 'sm_syndicateMemberIdAttr', $national_id);
         } else {
-            return $wp_user_id; // Return WP_Error
+            // Fallback for extreme cases: try inserting without any email reliance or randomizing it further
+            $wp_user_id = wp_insert_user(array(
+                'user_login' => $national_id,
+                'user_email' => 'err.' . mt_rand(1000,9999) . '.' . $national_id . '@irseg.org',
+                'display_name' => $name,
+                'user_pass' => wp_generate_password(),
+                'role' => 'sm_member'
+            ));
+
+            if (is_wp_error($wp_user_id)) return $wp_user_id;
         }
 
         $insert_data = array(
