@@ -240,6 +240,38 @@ class Syndicate_Management {
         wp_send_json_success(['pong' => true, 'time' => current_time('mysql'), 'user_id' => get_current_user_id()]);
     }
 
+    public function filter_get_avatar($avatar, $id_or_email, $size, $default, $alt) {
+        $user_id = 0;
+        if (is_numeric($id_or_email)) {
+            $user_id = (int)$id_or_email;
+        } elseif (is_string($id_or_email) && ($user = get_user_by('email', $id_or_email))) {
+            $user_id = $user->ID;
+        } elseif (is_object($id_or_email) && !empty($id_or_email->user_id)) {
+            $user_id = (int)$id_or_email->user_id;
+        }
+
+        if ($user_id > 0) {
+            $member = SM_DB_Members::get_member_by_wp_user_id($user_id);
+            if ($member && !empty($member->photo_url)) {
+                $style = '';
+                if (preg_match('/style="([^"]*)"/i', $avatar, $matches)) {
+                    $style = $matches[1];
+                }
+                $class = 'avatar avatar-' . $size . ' photo';
+                $avatar = sprintf(
+                    '<img alt="%s" src="%s" class="%s" height="%s" width="%s" style="%s" />',
+                    esc_attr($alt),
+                    esc_url($member->photo_url),
+                    esc_attr($class),
+                    esc_attr($size),
+                    esc_attr($size),
+                    esc_attr($style)
+                );
+            }
+        }
+        return $avatar;
+    }
+
     private function define_public_hooks() {
         $plugin_public = new SM_Public($this->get_plugin_name(), $this->get_version());
         $this->loader->add_filter('show_admin_bar', $plugin_public, 'hide_admin_bar_for_non_admins');
@@ -265,6 +297,7 @@ class Syndicate_Management {
 
     public function run() {
         add_action('plugins_loaded', array($this, 'check_version_updates'));
+        add_filter('get_avatar', array($this, 'filter_get_avatar'), 10, 5);
         $this->loader->add_action('init', $this, 'schedule_maintenance_cron');
         $this->loader->add_action('init', 'SM_Backup_Manager', 'schedule_automated_backup');
         set_error_handler(array($this, 'handle_errors'));
