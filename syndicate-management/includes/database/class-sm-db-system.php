@@ -279,6 +279,8 @@ class SM_DB_System {
         // 1. Not dismissed.
         // 2. If viewed (acknowledged), visible for 48 hours.
         // 3. If not viewed, visible for 30 days.
+        $is_full_access = in_array('administrator', $roles) || in_array('sm_full_access', $roles);
+
         $alerts = $wpdb->get_results($wpdb->prepare("
             SELECT a.*, v.acknowledged, v.is_dismissed, v.created_at as viewed_at
             FROM {$wpdb->prefix}sm_alerts a
@@ -290,29 +292,45 @@ class SM_DB_System {
                 OR
                 v.acknowledged = 1 AND v.created_at >= DATE_SUB(NOW(), INTERVAL 48 HOUR)
             )
+            ORDER BY a.created_at DESC
         ", $user_id));
 
         $filtered = [];
         foreach ($alerts as $a) {
-            $pass = true;
+            $pass = false;
+
+            // Target Roles check
             if (!empty($a->target_roles)) {
                 $target_roles = json_decode($a->target_roles, true);
-                if (!empty($target_roles) && empty(array_intersect($roles, $target_roles))) $pass = false;
+                if (!empty($target_roles) && !empty(array_intersect($roles, (array)$target_roles))) $pass = true;
             }
+
+            // Target Users check
+            if (!$pass && !empty($a->target_users)) {
+                $target_users = array_map('trim', explode(',', $a->target_users));
+                if (in_array($user->user_login, $target_users)) {
+                    $pass = true;
+                } else {
+                    $member = SM_DB_Members::get_member_by_username($user->user_login);
+                    if ($member && in_array($member->national_id, $target_users)) $pass = true;
+                }
+            }
+
+            // Target Ranks check
             if ($pass && !empty($a->target_ranks)) {
                 $target_ranks = json_decode($a->target_ranks, true);
                 if (!empty($target_ranks) && !in_array($rank, $target_ranks)) $pass = false;
             }
-            if ($pass && !empty($a->target_users)) {
-                $target_users = array_map('trim', explode(',', $a->target_users));
-                if (!in_array($user->user_login, $target_users)) {
-                    $member = SM_DB_Members::get_member_by_username($user->user_login);
-                    if (!$member || !in_array($member->national_id, $target_users)) $pass = false;
-                }
-            }
-            if ($pass && !empty($a->target_branch) && $a->target_branch !== 'all') {
+
+            // Branch check: If alert has target_branch, and user is not full access, must match.
+            if ($pass && !empty($a->target_branch) && $a->target_branch !== 'all' && !$is_full_access) {
                 if ($governorate !== $a->target_branch) $pass = false;
             }
+
+            // Global alerts (no role/user targeting) - should we allow them?
+            // If both roles and users are empty, it's public? No, usually sm_alerts are targeted.
+            if (empty($a->target_roles) && empty($a->target_users)) $pass = true;
+
             if ($pass) $filtered[] = $a;
         }
         return $filtered;

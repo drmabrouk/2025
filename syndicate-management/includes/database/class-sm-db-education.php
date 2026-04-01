@@ -194,13 +194,27 @@ class SM_DB_Education {
     public static function assign_test($test_id, $user_id) {
         global $wpdb;
         $assigned_by = get_current_user_id();
-        return $wpdb->insert("{$wpdb->prefix}sm_test_assignments", [
+        $res = $wpdb->insert("{$wpdb->prefix}sm_test_assignments", [
             'test_id' => intval($test_id),
             'user_id' => intval($user_id),
             'assigned_by' => intval($assigned_by),
             'status' => 'assigned',
             'created_at' => current_time('mysql')
         ]);
+        if ($res) {
+            $u = get_userdata($user_id);
+            $test = self::get_survey($test_id);
+            if ($u && $test) {
+                SM_DB_System::save_alert([
+                    'title' => 'تعيين اختبار جديد',
+                    'message' => 'تم تعيين اختبار جديد لك: ' . $test->title,
+                    'severity' => 'info',
+                    'target_users' => $u->user_login,
+                    'target_url' => home_url('/practice-test')
+                ]);
+            }
+        }
+        return $res;
     }
 
     public static function get_test_assignments($test_id = null) {

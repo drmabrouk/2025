@@ -209,6 +209,20 @@ class SM_Notifications {
         foreach ($ms as $m) {
             if (!self::already_notified($m->id, 'membership_renewal', 25)) {
                 self::send_template_notification($m->id, 'membership_renewal', ['{year}' => $cy]);
+
+                $member_user = SM_DB_Members::get_member_by_id($m->id);
+                if ($member_user && $member_user->wp_user_id) {
+                    $u = get_userdata($member_user->wp_user_id);
+                    if ($u) {
+                        SM_DB::save_alert([
+                            'title' => 'تجديد العضوية السنوية',
+                            'message' => "نحيطكم علماً بقرب موعد انتهاء صلاحية عضويتكم لعام $cy. يرجى التجديد لتجنب الغرامات.",
+                            'severity' => 'warning',
+                            'target_users' => $u->user_login,
+                            'target_url' => home_url('/my-account')
+                        ]);
+                    }
+                }
             }
         }
     }
@@ -227,6 +241,22 @@ class SM_Notifications {
             foreach ($ms as $m) {
                 if (!self::already_notified($m->id, $type, 5)) {
                     self::send_template_notification($m->id, $type, ['{expiry_date}' => $m->exp, '{facility_name}' => $m->facility_name ?? '']);
+
+                    $member_user = SM_DB_Members::get_member_by_id($m->id);
+                    if ($member_user && $member_user->wp_user_id) {
+                        $u = get_userdata($member_user->wp_user_id);
+                        if ($u) {
+                            $title = ($type === 'license_practice') ? 'تجديد تصريح المزاولة' : 'تجديد ترخيص المنشأة';
+                            $msg = ($type === 'license_practice') ? "ينتهي تصريح مزاولة المهنة الخاص بك في {$m->exp}." : "ينتهي ترخيص منشأة ({$m->facility_name}) في {$m->exp}.";
+                            SM_DB::save_alert([
+                                'title' => $title,
+                                'message' => $msg,
+                                'severity' => 'warning',
+                                'target_users' => $u->user_login,
+                                'target_url' => home_url('/my-account')
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -247,6 +277,19 @@ class SM_Notifications {
             $dues = SM_Finance::calculate_member_dues($m);
             if ($dues['balance'] > 500 && !self::already_notified($m->id, 'payment_reminder', 30)) {
                 self::send_template_notification($m->id, 'payment_reminder', ['{balance}' => $dues['balance']]);
+
+                if ($m->wp_user_id) {
+                    $u = get_userdata($m->wp_user_id);
+                    if ($u) {
+                        SM_DB::save_alert([
+                            'title' => 'متأخرات مالية',
+                            'message' => "توجد مبالغ مستحقة على حسابكم بقيمة {$dues['balance']} ج.م. يرجى سدادها لضمان استمرار الخدمات.",
+                            'severity' => 'critical',
+                            'target_users' => $u->user_login,
+                            'target_url' => home_url('/my-account')
+                        ]);
+                    }
+                }
             }
         }
     }
