@@ -369,6 +369,15 @@ class SM_DB_Members {
         if ($id) {
             SM_Logger::log('إضافة عضو جديد', "تمت إضافة العضو: $name بنجاح (الرقم القومي: $national_id)");
             SM_Finance::invalidate_financial_caches($insert_data['governorate'] ?? null);
+
+            SM_DB_System::save_alert([
+                'title' => 'تسجيل عضو جديد',
+                'message' => 'تم تسجيل عضو جديد في النظام: ' . $name,
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_branch' => $insert_data['governorate'] ?? '',
+                'target_url' => add_query_arg(['sm_tab' => 'members', 'mid' => $id], home_url('/dashboard'))
+            ]);
         }
 
         return $id;
@@ -565,7 +574,7 @@ class SM_DB_Members {
 
     public static function add_membership_request($data) {
         global $wpdb;
-        return $wpdb->insert("{$wpdb->prefix}sm_membership_requests", array(
+        $res = $wpdb->insert("{$wpdb->prefix}sm_membership_requests", array(
             'national_id' => sanitize_text_field($data['national_id']),
             'name' => sanitize_text_field($data['name']),
             'gender' => sanitize_text_field($data['gender'] ?? 'male'),
@@ -587,6 +596,18 @@ class SM_DB_Members {
             'status' => 'Pending Payment',
             'created_at' => current_time('mysql')
         ));
+
+        if ($res) {
+            SM_DB_System::save_alert([
+                'title' => 'طلب عضوية جديد',
+                'message' => 'تم استلام طلب عضوية جديد من: ' . sanitize_text_field($data['name']),
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_branch' => sanitize_text_field($data['governorate'] ?? ''),
+                'target_url' => add_query_arg('sm_tab', 'membership-requests', home_url('/dashboard'))
+            ]);
+        }
+        return $res;
     }
 
     public static function update_membership_request($id, $data) {
@@ -677,12 +698,24 @@ class SM_DB_Members {
 
     public static function add_update_request($member_id, $data) {
         global $wpdb;
-        return $wpdb->insert("{$wpdb->prefix}sm_update_requests", array(
+        $res = $wpdb->insert("{$wpdb->prefix}sm_update_requests", array(
             'member_id' => $member_id,
             'requested_data' => json_encode($data),
             'status' => 'pending',
             'created_at' => current_time('mysql')
         ));
+        if ($res) {
+            $member = self::get_member_by_id($member_id);
+            SM_DB_System::save_alert([
+                'title' => 'طلب تحديث بيانات',
+                'message' => 'قام العضو ' . ($member->name ?? 'ID:'.$member_id) . ' بتقديم طلب لتحديث بياناته.',
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_branch' => $member->governorate ?? '',
+                'target_url' => add_query_arg('sm_tab', 'update-requests', home_url('/dashboard'))
+            ]);
+        }
+        return $res;
     }
 
     public static function get_update_requests($status = 'pending') {
@@ -735,7 +768,7 @@ class SM_DB_Members {
             SM_Logger::log('اعتماد طلب تحديث بيانات', "تم تحديث بيانات العضو ID: {$request->member_id}");
         }
 
-        return $wpdb->update(
+        $res = $wpdb->update(
             "{$wpdb->prefix}sm_update_requests",
             array(
                 'status' => $status,
@@ -744,6 +777,21 @@ class SM_DB_Members {
             ),
             array('id' => $request_id)
         );
+
+        if ($res) {
+            $member = self::get_member_by_id($request->member_id);
+            if ($member && $member->wp_user_id) {
+                $status_text = ($status === 'approved') ? 'مقبول' : 'مرفوض';
+                SM_DB_System::save_alert([
+                    'title' => 'تحديث طلب تعديل البيانات',
+                    'message' => 'تم ' . $status_text . ' طلب تحديث البيانات الخاص بك.',
+                    'severity' => ($status === 'approved') ? 'info' : 'warning',
+                    'target_users' => get_userdata($member->wp_user_id)->user_login,
+                    'target_url' => home_url('/my-account')
+                ]);
+            }
+        }
+        return $res;
     }
 
     public static function soft_delete_facility($id) {

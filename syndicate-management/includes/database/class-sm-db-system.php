@@ -225,7 +225,9 @@ class SM_DB_System {
             'status' => sanitize_text_field($data['status'] ?? 'active'),
             'target_roles' => !empty($data['target_roles']) ? json_encode((array)$data['target_roles']) : '',
             'target_ranks' => !empty($data['target_ranks']) ? json_encode((array)$data['target_ranks']) : '',
-            'target_users' => sanitize_text_field($data['target_users'] ?? '')
+            'target_users' => sanitize_text_field($data['target_users'] ?? ''),
+            'target_url' => esc_url_raw($data['target_url'] ?? ''),
+            'target_branch' => sanitize_text_field($data['target_branch'] ?? '')
         ];
 
         if (!empty($data['id'])) {
@@ -271,13 +273,23 @@ class SM_DB_System {
 
         $roles = (array)$user->roles;
         $rank = get_user_meta($user_id, 'sm_rank', true);
+        $governorate = get_user_meta($user_id, 'sm_governorate', true);
 
+        // Visibility logic:
+        // 1. Not dismissed.
+        // 2. If viewed (acknowledged), visible for 48 hours.
+        // 3. If not viewed, visible for 30 days.
         $alerts = $wpdb->get_results($wpdb->prepare("
-            SELECT a.*
+            SELECT a.*, v.acknowledged, v.is_dismissed, v.created_at as viewed_at
             FROM {$wpdb->prefix}sm_alerts a
             LEFT JOIN {$wpdb->prefix}sm_alert_views v ON a.id = v.alert_id AND v.user_id = %d
             WHERE a.status = 'active'
-            AND v.id IS NULL
+            AND (v.is_dismissed IS NULL OR v.is_dismissed = 0)
+            AND (
+                v.id IS NULL AND a.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                OR
+                v.acknowledged = 1 AND v.created_at >= DATE_SUB(NOW(), INTERVAL 48 HOUR)
+            )
         ", $user_id));
 
         $filtered = [];
@@ -298,6 +310,9 @@ class SM_DB_System {
                     if (!$member || !in_array($member->national_id, $target_users)) $pass = false;
                 }
             }
+            if ($pass && !empty($a->target_branch) && $a->target_branch !== 'all') {
+                if ($governorate !== $a->target_branch) $pass = false;
+            }
             if ($pass) $filtered[] = $a;
         }
         return $filtered;
@@ -305,10 +320,31 @@ class SM_DB_System {
 
     public static function acknowledge_alert($alert_id, $user_id) {
         global $wpdb;
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}sm_alert_views WHERE alert_id = %d AND user_id = %d", $alert_id, $user_id));
+        if ($exists) {
+            return $wpdb->update("{$wpdb->prefix}sm_alert_views", [
+                'acknowledged' => 1,
+                'created_at' => current_time('mysql')
+            ], ['id' => $exists]);
+        }
         return $wpdb->insert("{$wpdb->prefix}sm_alert_views", [
             'alert_id' => intval($alert_id),
             'user_id' => intval($user_id),
             'acknowledged' => 1,
+            'created_at' => current_time('mysql')
+        ]);
+    }
+
+    public static function dismiss_alert($alert_id, $user_id) {
+        global $wpdb;
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}sm_alert_views WHERE alert_id = %d AND user_id = %d", $alert_id, $user_id));
+        if ($exists) {
+            return $wpdb->update("{$wpdb->prefix}sm_alert_views", ['is_dismissed' => 1], ['id' => $exists]);
+        }
+        return $wpdb->insert("{$wpdb->prefix}sm_alert_views", [
+            'alert_id' => intval($alert_id),
+            'user_id' => intval($user_id),
+            'is_dismissed' => 1,
             'created_at' => current_time('mysql')
         ]);
     }
