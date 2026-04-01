@@ -150,17 +150,17 @@ class SM_Auth {
                 from { opacity: 1; transform: translateY(0); }
                 to { opacity: 0; transform: translateY(-20px); }
             }
-            @media (max-width: 767px) {
-                .sm-topbar-icons-wrap { display: none !important; }
-                .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
-                .sm-user-avatar-wrap { display: none !important; }
-                .sm-user-profile-nav { padding: 4px 10px !important; border: none !important; background: transparent !important; box-shadow: none !important; }
-                .sm-user-greeting { font-size: 14px !important; font-weight: 800 !important; }
-            }
-            @media (max-width: 480px) {
-                .sm-user-info-text { display: none !important; }
-                .sm-user-avatar-wrap { display: block !important; border: 2px solid var(--sm-primary-color) !important; }
-                .sm-user-profile-nav { padding: 0 !important; }
+            .sm-mobile-welcome { display: none; }
+            @media (max-width: 768px) {
+                .sm-user-greeting, .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
+                .sm-mobile-welcome { display: inline !important; font-size: 14px !important; font-weight: 800 !important; }
+                .sm-topbar-user-wrap { gap: 8px !important; }
+                .sm-user-profile-nav { padding: 4px 10px !important; }
+                .sm-header-circle-icon { width: 30px !important; height: 30px !important; }
+                .sm-header-circle-icon .dashicons { font-size: 16px !important; width: 16px !important; height: 16px !important; }
+                .sm-user-avatar-wrap { width: 30px !important; height: 30px !important; }
+                .sm-topbar-icons-wrap { gap: 4px !important; }
+                .sm-icon-badge { top: -2px !important; right: -2px !important; width: 15px !important; height: 15px !important; font-size: 8px !important; }
             }
         </style>
         <div id="sm-toast-root" class="sm-toast-container"></div>
@@ -243,7 +243,10 @@ class SM_Auth {
             <div class="sm-user-dropdown">
                 <div class="sm-user-profile-nav" onclick="smToggleUserDropdown()" style="display: flex; align-items: center; gap: 12px; background: #fff; padding: 6px 14px; border-radius: 50px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <div class="sm-user-info-text" style="text-align: right;">
-                        <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;"><span class="sm-user-greeting"><?php echo $greeting; ?></span><span class="sm-user-name-separator">، </span><span class="sm-user-name"><?php echo $user->display_name; ?></span></div>
+                        <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;">
+                            <span class="sm-user-greeting"><?php echo $greeting; ?></span><span class="sm-user-name-separator">، </span><span class="sm-user-name"><?php echo $user->display_name; ?></span>
+                            <span class="sm-mobile-welcome">أهلاً بك!</span>
+                        </div>
                         <div class="sm-user-status" style="font-size: 10px; color: #38a169; font-weight:600;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 9px; width: 9px; height: 9px;"></span></div>
                     </div>
                     <div id="sm-topbar-avatar" class="sm-user-avatar-wrap" style="width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--sm-primary-color); flex-shrink: 0; box-shadow: 0 0 0 2px rgba(246, 48, 73, 0.1);">
