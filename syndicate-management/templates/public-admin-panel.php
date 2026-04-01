@@ -32,12 +32,7 @@
 
     const SM_UI = {
         showNotification: function(message, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = 'sm-toast';
-            toast.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:white; padding:15px 30px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:10001; display:flex; align-items:center; gap:10px; border-right:5px solid " + (isError ? '#e53e3e' : '#38a169');
-            toast.innerHTML = `<strong>${isError ? '✖' : '✓'}</strong> <span>${message}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.5s'; setTimeout(() => toast.remove(), 500); }, 3000);
+            console.log('SM_NOTIFICATION:', (isError ? '[ERROR] ' : '[SUCCESS] ') + message);
         },
 
         handleAjaxError: function(err, customMsg = 'حدث خطأ أثناء تنفيذ العملية') {
@@ -586,6 +581,60 @@
         });
     };
 
+    window.smDismissAlert = function(id) {
+        const item = document.getElementById('sm-alert-item-' + id);
+        if (item) item.style.opacity = '0.5';
+
+        const action = 'sm_dismiss_alert_ajax';
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('alert_id', id);
+        formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
+        fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                if (item) item.remove();
+                const badge = document.querySelector('.sm-notifications-dropdown .sm-icon-badge');
+                if (badge) {
+                    let count = parseInt(badge.innerText);
+                    count--;
+                    if (count <= 0) badge.remove();
+                    else badge.innerText = count;
+                }
+                const list = document.querySelector('#sm-notifications-menu div[style*="max-height"]');
+                if (list && list.children.length === 0) {
+                    list.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>';
+                    const delAll = document.querySelector('#sm-notifications-menu button[onclick*="smDismissAllAlerts"]');
+                    if (delAll) delAll.remove();
+                }
+            }
+        });
+    };
+
+    window.smDismissAllAlerts = function() {
+        if (!confirm('هل أنت متأكد من حذف كافة التنبيهات؟')) return;
+        const menu = document.getElementById('sm-notifications-menu');
+        menu.style.opacity = '0.5';
+        menu.style.pointerEvents = 'none';
+
+        const action = 'sm_dismiss_all_alerts_ajax';
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
+        fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                location.reload();
+            } else {
+                menu.style.opacity = '1';
+                menu.style.pointerEvents = 'auto';
+                alert('فشل حذف التنبيهات');
+            }
+        });
+    };
+
     window.smEditProfile = function() {
         document.getElementById('sm-profile-view').style.display = 'none';
         document.getElementById('sm-profile-edit').style.display = 'block';
@@ -1049,24 +1098,36 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                             <span class="sm-icon-badge" style="background: #f6ad55;"><?php echo count($notif_alerts); ?></span>
                         <?php endif; ?>
                     </a>
-                    <div id="sm-notifications-menu" style="display: none; position: absolute; top: 150%; left: 0; background: white; border: 1px solid var(--sm-border-color); border-radius: 8px; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; padding: 15px;">
-                        <h4 style="margin: 0 0 10px 0; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 8px;">التنبيهات والإشعارات</h4>
-                        <?php if (empty($notif_alerts)): ?>
-                            <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
-                        <?php else: ?>
-                            <?php foreach ($notif_alerts as $a): ?>
-                                <div style="font-size: 12px; padding: 8px; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 8px; align-items: flex-start;">
-                                    <span class="dashicons <?php echo $a['type'] == 'system' ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo $a['type'] == 'system' ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
-                                    <span>
-                        <strong style="display:block; margin-bottom:2px;"><?php echo esc_html($a['text']); ?></strong>
-                                        <?php if($a['type'] == 'system'): ?>
-                            <div style="font-size:10px; color:#718096; margin-bottom:5px;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 80, "...")); ?></div>
-                            <a href="javascript:smAcknowledgeAlert(<?php echo intval($a['id']); ?>)" style="font-size:10px; color:var(--sm-primary-color); font-weight:700;">عرض التفاصيل / إغلاق</a>
+                    <div id="sm-notifications-menu" style="display: none; position: absolute; top: 150%; left: 0; background: white; border: 1px solid var(--sm-border-color); border-radius: 8px; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; padding: 15px; text-align:right;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                            <h4 style="margin: 0; font-size: 14px;">التنبيهات والإشعارات</h4>
+                            <?php if (count($notif_alerts) > 0): ?>
+                                <button onclick="smDismissAllAlerts()" style="background: none; border: none; color: #e53e3e; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0;">حذف الكل</button>
+                            <?php endif; ?>
+                        </div>
+                        <div style="max-height: 350px; overflow-y: auto;">
+                            <?php if (empty($notif_alerts)): ?>
+                                <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
+                            <?php else: ?>
+                                <?php foreach ($notif_alerts as $a): ?>
+                                    <div id="sm-alert-item-<?php echo intval($a['id'] ?? 0); ?>" style="font-size: 12px; padding: 8px; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 8px; align-items: flex-start; position: relative;">
+                                        <span class="dashicons <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
+                                        <span style="flex: 1;">
+                                            <strong style="display:block; margin-bottom:2px;"><?php echo esc_html($a['text']); ?></strong>
+                                            <?php if(isset($a['type']) && $a['type'] == 'system'): ?>
+                                                <div style="font-size:10px; color:#718096; margin-bottom:5px;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 80, "...")); ?></div>
+                                                <a href="javascript:smAcknowledgeAlert(<?php echo intval($a['id']); ?>)" style="font-size:10px; color:var(--sm-primary-color); font-weight:700;">إقرار واستمرار</a>
+                                            <?php endif; ?>
+                                        </span>
+                                        <?php if(isset($a['id'])): ?>
+                                            <a href="javascript:smDismissAlert(<?php echo intval($a['id']); ?>)" style="color: #cbd5e0; text-decoration: none;" title="حذف">
+                                                <span class="dashicons dashicons-no-alt" style="font-size: 14px; width: 14px; height: 14px;"></span>
+                                            </a>
                                         <?php endif; ?>
-                                    </span>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

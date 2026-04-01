@@ -539,45 +539,6 @@ class SM_Public {
         SM_Logger::log('تسجيل دخول', "المستخدم: $user_login");
     }
 
-    public function inject_global_alerts() {
-        if (!is_user_logged_in()) {
-            return;
-        }
-        $alerts = SM_DB::get_active_alerts_for_user(get_current_user_id());
-        if (empty($alerts)) {
-            return;
-        }
-        foreach ($alerts as $a) {
-            $bg = $a->severity === 'critical' ? '#fff5f5' : ($a->severity === 'warning' ? '#fffaf0' : '#fff');
-            $border = $a->severity === 'critical' ? '#feb2b2' : ($a->severity === 'warning' ? '#f6ad55' : '#e2e8f0');
-            ?>
-            <div id="sm-global-alert-<?php echo $a->id; ?>" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99999; display:flex; align-items:center; justify-content:center;">
-                <div style="background:<?php echo $bg; ?>; border:2px solid <?php echo $border; ?>; border-radius:15px; width:90%; max-width:500px; padding:30px; text-align:center; direction:rtl;">
-                    <h2 style="margin:0 0 15px 0; font-weight:800;"><?php echo esc_html($a->title); ?></h2>
-                    <div style="margin-bottom:25px;"><?php echo wp_kses_post($a->message); ?></div>
-                    <button onclick="smAcknowledgeAlert(<?php echo $a->id; ?>)" class="sm-btn" style="width:100%;"><?php echo $a->must_acknowledge ? 'إقرار واستمرار' : 'إغلاق'; ?></button>
-                </div>
-            </div>
-            <?php
-        }
-        ?>
-        <script>
-        function smAcknowledgeAlert(aid) {
-            const action = 'sm_acknowledge_alert';
-            const fd = new FormData();
-            fd.append('action', action);
-            fd.append('alert_id', aid);
-            fd.append('nonce', '<?php echo wp_create_nonce("sm_admin_action"); ?>');
-            fetch(ajaxurl + '?action=' + action, { method: 'POST', body: fd })
-            .then(r => r.json())
-            .then(res => {
-                document.getElementById('sm-global-alert-' + aid).remove();
-            });
-        }
-        </script>
-        <?php
-    }
-
     public function handle_form_submission() {
         if (isset($_POST['sm_save_appearance'])) {
             check_admin_referer('sm_admin_action', 'sm_admin_nonce');

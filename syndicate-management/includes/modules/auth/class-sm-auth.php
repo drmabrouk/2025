@@ -110,46 +110,6 @@ class SM_Auth {
         ob_start();
         ?>
         <style>
-            .sm-toast-container {
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1000000;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                pointer-events: none;
-                width: 100%;
-                max-width: 400px;
-                padding: 0 20px;
-            }
-            .sm-toast {
-                background: var(--sm-dark-color);
-                color: #fff;
-                padding: 15px 20px;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                animation: smToastIn 0.3s ease-out forwards;
-                pointer-events: auto;
-                border-right: 4px solid var(--sm-primary-color);
-                direction: rtl;
-                font-family: 'Rubik', sans-serif !important;
-            }
-            .sm-toast.fade-out {
-                animation: smToastOut 0.3s ease-in forwards;
-            }
-            @keyframes smToastIn {
-                from { opacity: 0; transform: translateY(-20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes smToastOut {
-                from { opacity: 1; transform: translateY(0); }
-                to { opacity: 0; transform: translateY(-20px); }
-            }
             @media (max-width: 767px) {
                 .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
                 .sm-topbar-user-wrap { gap: 8px !important; }
@@ -165,7 +125,6 @@ class SM_Auth {
                 .sm-user-info-text { display: none !important; }
             }
         </style>
-        <div id="sm-toast-root" class="sm-toast-container"></div>
         <div class="sm-topbar-user-wrap" style="position:relative; display:flex; align-items:center; gap:12px; margin:0; padding:0;" dir="rtl">
 
             <div class="sm-topbar-icons-wrap" style="display: flex; gap: 8px; align-items: center;">
@@ -217,7 +176,12 @@ class SM_Auth {
                         <?php endif; ?>
                     </a>
                     <div id="sm-notifications-menu" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 100000; padding: 20px; text-align:right;">
-                        <h4 style="margin: 0 0 15px 0; font-size: 14px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-weight:900; color:var(--sm-dark-color);">التنبيهات والإشعارات</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                            <h4 style="margin: 0; font-size: 14px; font-weight:900; color:var(--sm-dark-color);">التنبيهات والإشعارات</h4>
+                            <?php if (count($notif_alerts) > 0): ?>
+                                <button onclick="smDismissAllAlerts()" style="background: none; border: none; color: #e53e3e; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0;">حذف الكل</button>
+                            <?php endif; ?>
+                        </div>
                         <div style="max-height: 350px; overflow-y: auto;">
                             <?php if (empty($notif_alerts)): ?>
                                 <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
@@ -323,55 +287,6 @@ class SM_Auth {
                 }
             };
 
-            window.smShowToast = function(text, type = 'info', url = '') {
-                const root = document.getElementById('sm-toast-root');
-                if (!root) return;
-
-                const toast = document.createElement('div');
-                toast.className = 'sm-toast';
-                if (url) toast.style.cursor = 'pointer';
-                const icon = type === 'critical' ? 'dashicons-warning' : (type === 'warning' ? 'dashicons-info' : 'dashicons-megaphone');
-                const color = type === 'critical' ? '#e53e3e' : (type === 'warning' ? '#d69e2e' : 'var(--sm-primary-color)');
-                toast.style.borderRightColor = color;
-
-                toast.innerHTML = `
-                    <span class="dashicons ${icon}" style="color: ${color}"></span>
-                    <div style="flex: 1; font-size: 14px; font-weight: 600;">${text}</div>
-                `;
-
-                if (url) {
-                    toast.onclick = () => window.location.href = url;
-                }
-
-                root.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.classList.add('fade-out');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            };
-
-            // Process unviewed alerts as toasts on load
-            document.addEventListener('DOMContentLoaded', function() {
-                const alertsJson = <?php
-                    $unviewed = array_filter($sys_alerts, function($a) { return empty($a->acknowledged); });
-                    echo json_encode(array_values($unviewed));
-                ?>;
-                try {
-                    const alerts = alertsJson;
-                    alerts.forEach((a, index) => {
-                        setTimeout(() => {
-                            smShowToast(a.title, a.severity, a.target_url);
-                            // Auto-acknowledge so it doesn't repeat
-                            const formData = new FormData();
-                            formData.append('action', 'sm_acknowledge_alert_ajax');
-                            formData.append('alert_id', a.id);
-                            formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
-                            fetch(ajaxurl + '?action=sm_acknowledge_alert_ajax', { method: 'POST', body: formData });
-                        }, index * 500);
-                    });
-                } catch(e) {}
-            });
             window.smToggleNotifications = function() {
                 const menu = document.getElementById('sm-notifications-menu');
                 if (!menu.style.display || menu.style.display === 'none') {
@@ -429,10 +344,34 @@ class SM_Auth {
                             if (count <= 0) badge.remove();
                             else badge.innerText = count;
                         }
-                        const menu = document.querySelector('#sm-notifications-menu div[style*="max-height"]');
-                        if (menu && menu.children.length === 0) {
-                            menu.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>';
+                        const list = document.querySelector('#sm-notifications-menu div[style*="max-height"]');
+                        if (list && list.children.length === 0) {
+                            list.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>';
+                            const delAll = document.querySelector('#sm-notifications-menu button[onclick*="smDismissAllAlerts"]');
+                            if (delAll) delAll.remove();
                         }
+                    }
+                });
+            };
+            window.smDismissAllAlerts = function() {
+                if (!confirm('هل أنت متأكد من حذف كافة التنبيهات؟')) return;
+                const menu = document.getElementById('sm-notifications-menu');
+                menu.style.opacity = '0.5';
+                menu.style.pointerEvents = 'none';
+
+                const action = 'sm_dismiss_all_alerts_ajax';
+                const formData = new FormData();
+                formData.append('action', action);
+                formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
+                fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        menu.style.opacity = '1';
+                        menu.style.pointerEvents = 'auto';
+                        alert('فشل حذف التنبيهات');
                     }
                 });
             };
@@ -681,6 +620,21 @@ class SM_Auth {
 
             SM_DB::acknowledge_alert($alert_id, $user_id);
             wp_send_json_success('تم تأكيد استلام التنبيه');
+        } catch (Throwable $e) {
+            wp_send_json_error(['message' => $e->getMessage()]);
+        }
+    }
+
+    public static function ajax_dismiss_all_alerts_ajax() {
+        try {
+            if (!is_user_logged_in()) {
+                wp_send_json_error(['message' => 'يجب تسجيل الدخول أولاً']);
+            }
+            check_ajax_referer('sm_profile_action', 'nonce');
+            $user_id = get_current_user_id();
+
+            SM_DB::dismiss_all_alerts($user_id);
+            wp_send_json_success('تم حذف كافة التنبيهات');
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }

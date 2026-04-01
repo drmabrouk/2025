@@ -353,6 +353,17 @@ class SM_DB_System {
         ]);
     }
 
+    public static function dismiss_all_alerts($user_id) {
+        global $wpdb;
+        $active_alerts = self::get_active_alerts_for_user($user_id);
+        if (empty($active_alerts)) return true;
+
+        foreach ($active_alerts as $a) {
+            self::dismiss_alert($a->id, $user_id);
+        }
+        return true;
+    }
+
     public static function dismiss_alert($alert_id, $user_id) {
         global $wpdb;
         $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}sm_alert_views WHERE alert_id = %d AND user_id = %d", $alert_id, $user_id));
