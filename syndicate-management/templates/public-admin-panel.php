@@ -534,30 +534,6 @@
         frame.open();
     };
 
-    window.smToggleUserDropdown = function() {
-        const menu = document.getElementById('sm-user-dropdown-menu');
-        if (menu.style.display === 'none') {
-            menu.style.display = 'block';
-            document.getElementById('sm-profile-view').style.display = 'block';
-            document.getElementById('sm-profile-edit').style.display = 'none';
-            const notif = document.getElementById('sm-notifications-menu');
-            if (notif) notif.style.display = 'none';
-        } else {
-            menu.style.display = 'none';
-        }
-    };
-
-    window.smToggleNotifications = function() {
-        const menu = document.getElementById('sm-notifications-menu');
-        if (menu.style.display === 'none') {
-            menu.style.display = 'block';
-            const userMenu = document.getElementById('sm-user-dropdown-menu');
-            if (userMenu) userMenu.style.display = 'none';
-        } else {
-            menu.style.display = 'none';
-        }
-    };
-
     window.smOpenFinanceModal = function(memberId) {
         const modal = document.getElementById('sm-finance-member-modal');
         const body = document.getElementById('sm-finance-modal-body');
@@ -580,99 +556,6 @@
             body.innerHTML = '<div style="color:red; text-align:center; padding: 20px;">حدث خطأ في الاتصال.</div>';
         });
     };
-
-    window.smDismissAlert = function(id) {
-        const item = document.getElementById('sm-alert-item-' + id);
-        if (item) item.style.opacity = '0.5';
-
-        const action = 'sm_dismiss_alert_ajax';
-        const formData = new FormData();
-        formData.append('action', action);
-        formData.append('alert_id', id);
-        formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
-        fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
-        .then(r => r.json())
-        .then(res => {
-            if (res.success) {
-                if (item) item.remove();
-                const badge = document.querySelector('.sm-notifications-dropdown .sm-icon-badge');
-                if (badge) {
-                    let count = parseInt(badge.innerText);
-                    count--;
-                    if (count <= 0) badge.remove();
-                    else badge.innerText = count;
-                }
-                const list = document.querySelector('#sm-notifications-menu div[style*="max-height"]');
-                if (list && list.children.length === 0) {
-                    list.innerHTML = '<div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>';
-                    const delAll = document.querySelector('#sm-notifications-menu button[onclick*="smDismissAllAlerts"]');
-                    if (delAll) delAll.remove();
-                }
-            }
-        });
-    };
-
-    window.smDismissAllAlerts = function() {
-        if (!confirm('هل أنت متأكد من حذف كافة التنبيهات؟')) return;
-        const menu = document.getElementById('sm-notifications-menu');
-        menu.style.opacity = '0.5';
-        menu.style.pointerEvents = 'none';
-
-        const action = 'sm_dismiss_all_alerts_ajax';
-        const formData = new FormData();
-        formData.append('action', action);
-        formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
-        fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
-        .then(r => r.json())
-        .then(res => {
-            if (res.success) {
-                location.reload();
-            } else {
-                menu.style.opacity = '1';
-                menu.style.pointerEvents = 'auto';
-                alert('فشل حذف التنبيهات');
-            }
-        });
-    };
-
-    window.smEditProfile = function() {
-        document.getElementById('sm-profile-view').style.display = 'none';
-        document.getElementById('sm-profile-edit').style.display = 'block';
-    };
-
-    window.smSaveProfile = function() {
-        const name = document.getElementById('sm_edit_display_name').value;
-        const email = document.getElementById('sm_edit_user_email').value;
-        const pass = document.getElementById('sm_edit_user_pass').value;
-        const nonce = '<?php echo wp_create_nonce("sm_profile_action"); ?>';
-        const action = 'sm_update_profile_ajax';
-
-        const formData = new FormData();
-        formData.append('action', action);
-        formData.append('display_name', name);
-        formData.append('user_email', email);
-        formData.append('user_pass', pass);
-        formData.append('nonce', nonce);
-
-        fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
-        .then(r => r.json())
-        .then(res => {
-            if (res.success) {
-                smShowNotification('تم تحديث الملف الشخصي بنجاح');
-                setTimeout(() => location.reload(), 500);
-            } else {
-                smHandleAjaxError(res);
-            }
-        }).catch(err => smHandleAjaxError(err));
-    };
-
-    document.addEventListener('click', function(e) {
-        const dropdown = document.querySelector('.sm-user-dropdown');
-        const menu = document.getElementById('sm-user-dropdown-menu');
-        if (dropdown && !dropdown.contains(e.target)) {
-            if (menu) menu.style.display = 'none';
-        }
-    });
 
     window.addEventListener('load', function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1041,153 +924,9 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                 </div>
             <?php endif; ?>
 
-            <div style="display: flex; gap: 15px; align-items: center; border-left: 1px solid var(--sm-border-color); padding-left: 20px;">
-                <!-- Homepage Icon -->
-                <a href="<?php echo home_url(); ?>" class="sm-header-circle-icon" title="الرئيسية">
-                    <span class="dashicons dashicons-admin-home"></span>
-                </a>
-
-                <!-- Messages Icon -->
-                <a href="<?php echo $is_restricted ? add_query_arg(['sm_tab' => 'my-profile', 'profile_tab' => 'correspondence']) : add_query_arg('sm_tab', 'messaging'); ?>" class="sm-header-circle-icon" title="المراسلات والشكاوى">
-                    <span class="dashicons dashicons-email"></span>
-                    <?php
-                    $unread_msgs = SM_DB_Communications::get_unread_count($user->ID);
-
-                    // Also count unread tickets for members
-                    if ($is_restricted) {
-                        $member = SM_DB_Members::get_member_by_wp_user_id($user->ID);
-                        if ($member) {
-                            $unread_tickets = SM_DB_Communications::get_unread_tickets_count($member->id);
-                            $unread_msgs += intval($unread_tickets);
-                        }
-                    }
-
-                    if ($unread_msgs > 0): ?>
-                        <span class="sm-icon-badge" style="background: #e53e3e;"><?php echo $unread_msgs; ?></span>
-                    <?php endif; ?>
-                </a>
-
-                <!-- Notifications Icon -->
-                <div class="sm-notifications-dropdown" style="position: relative;">
-                    <a href="javascript:void(0)" onclick="smToggleNotifications()" class="sm-header-circle-icon" title="التنبيهات">
-                        <span class="dashicons dashicons-bell"></span>
-                        <?php
-                        $notif_alerts = [];
-                        if ($is_restricted) {
-                            $member_by_wp = SM_DB_Members::get_member_by_wp_user_id($user->ID);
-                            if ($member_by_wp) {
-                                if ($member_by_wp->last_paid_membership_year < date('Y')) {
-                                    $notif_alerts[] = ['text' => 'يوجد متأخرات في تجديد العضوية السنوية', 'type' => 'warning'];
-                                }
-                            }
-                        }
-                        if (current_user_can('sm_manage_members')) {
-                            $pending_updates = SM_DB_Members::count_pending_update_requests();
-                            if ($pending_updates > 0) {
-                                $notif_alerts[] = ['text' => 'يوجد ' . $pending_updates . ' طلبات تحديث بيانات بانتظار المراجعة', 'type' => 'info'];
-                            }
-                        }
-
-                        // Integrated System Alerts
-                        $sys_alerts = SM_DB::get_active_alerts_for_user($user->ID);
-                        foreach($sys_alerts as $sa) {
-                            $notif_alerts[] = [
-                                'text' => $sa->title,
-                                'type' => 'system',
-                                'id' => $sa->id,
-                                'details' => $sa->message,
-                                'target_url' => $sa->target_url ?? ''
-                            ];
-                        }
-
-                        if (count($notif_alerts) > 0): ?>
-                            <span id="sm-notif-count" class="sm-icon-badge" style="background: #e53e3e;"><?php echo count($notif_alerts); ?></span>
-                        <?php endif; ?>
-                    </a>
-                    <div id="sm-notifications-menu" style="display: none; position: absolute; top: 150%; left: 0; background: white; border: 1px solid var(--sm-border-color); border-radius: 8px; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; padding: 15px; text-align:right;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                            <h4 style="margin: 0; font-size: 14px;">التنبيهات والإشعارات</h4>
-                            <?php if (count($notif_alerts) > 0): ?>
-                                <button onclick="smDismissAllAlerts()" style="background: none; border: none; color: #e53e3e; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0;">حذف الكل</button>
-                            <?php endif; ?>
-                        </div>
-                        <div style="max-height: 350px; overflow-y: auto;">
-                            <?php if (empty($notif_alerts)): ?>
-                                <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
-                            <?php else: ?>
-                                <?php foreach ($notif_alerts as $a): ?>
-                                    <div id="sm-alert-item-<?php echo intval($a['id'] ?? 0); ?>" style="font-size: 12px; padding: 10px 0; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 12px; align-items: flex-start; position: relative;">
-                                        <span class="dashicons <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
-                                        <span style="flex: 1; cursor: pointer;" onclick="smAcknowledgeAlert(<?php echo intval($a['id'] ?? 0); ?>, '<?php echo esc_js($a['target_url'] ?? ''); ?>')">
-                                            <strong style="display:block; margin-bottom:4px; color:var(--sm-dark-color);"><?php echo esc_html($a['text']); ?></strong>
-                                            <?php if(!empty($a['details'])): ?>
-                                                <div style="font-size:10px; color:#718096; margin-bottom:8px; line-height:1.5;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 100, "...")); ?></div>
-                                            <?php endif; ?>
-                                        </span>
-                                        <?php if(isset($a['id'])): ?>
-                                            <a href="javascript:smDismissAlert(<?php echo intval($a['id']); ?>)" style="color: #cbd5e0; text-decoration: none; margin-right: 5px;" title="حذف">
-                                                <span class="dashicons dashicons-no-alt" style="font-size: 16px; width: 16px; height: 16px;"></span>
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sm-user-dropdown" style="position: relative;">
-                <div class="sm-user-profile-nav" onclick="smToggleUserDropdown()" style="display: flex; align-items: center; gap: 12px; background: white; padding: 6px 12px; border-radius: 50px; border: 1px solid var(--sm-border-color); cursor: pointer;">
-                    <div style="text-align: right;">
-                        <div style="font-size: 0.85em; font-weight: 700; color: var(--sm-dark-color);"><?php echo $greeting . '، ' . $user->display_name; ?></div>
-                        <div style="font-size: 0.7em; color: #38a169;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 10px; width: 10px; height: 10px;"></span></div>
-                    </div>
-                    <div style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e53e3e; padding: 2px; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(229, 62, 62, 0.2);">
-                        <?php echo get_avatar($user->ID, 36, '', '', array('style' => 'border-radius: 50%; width: 100%; height: 100%; object-fit: cover;')); ?>
-                    </div>
-                </div>
-                <div id="sm-user-dropdown-menu" style="display: none; position: absolute; top: 110%; left: 0; background: white; border: 1px solid var(--sm-border-color); border-radius: 8px; width: 260px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; animation: smFadeIn 0.2s ease-out; padding: 20px 0;">
-                    <div id="sm-profile-view">
-                        <div style="padding: 20px 20px; border-bottom: 1px solid #f0f0f0; margin-bottom: 5px;">
-                            <div style="font-weight: 800; color: var(--sm-dark-color);"><?php echo $user->display_name; ?></div>
-                            <div style="font-size: 11px; color: var(--sm-text-gray);"><?php echo $user->user_email; ?></div>
-                        </div>
-                        <?php if (!$is_member): ?>
-                            <a href="javascript:smEditProfile()" class="sm-dropdown-item"><span class="dashicons dashicons-edit"></span> تعديل البيانات الشخصية</a>
-                        <?php endif; ?>
-                        <?php if ($is_member): ?>
-                            <a href="javascript:smEditProfile()" class="sm-dropdown-item"><span class="dashicons dashicons-lock"></span> تغيير كلمة المرور</a>
-                        <?php endif; ?>
-                        <?php if ($is_admin): ?>
-                            <a href="<?php echo add_query_arg('sm_tab', 'global-settings'); ?>" class="sm-dropdown-item"><span class="dashicons dashicons-admin-generic"></span> إعدادات النظام</a>
-                        <?php endif; ?>
-                        <a href="javascript:location.reload()" class="sm-dropdown-item"><span class="dashicons dashicons-update"></span> تحديث الصفحة</a>
-                    </div>
-
-                    <div id="sm-profile-edit" style="display: none; padding: 15px;">
-                        <div style="font-weight: 800; margin-bottom: 15px; font-size: 13px; border-bottom: 1px solid #eee; padding-bottom: 10px;">تعديل الملف الشخصي</div>
-                        <div class="sm-form-group" style="margin-bottom: 20px;">
-                            <label class="sm-label" style="font-size: 11px;">الاسم المفضل:</label>
-                            <input type="text" id="sm_edit_display_name" class="sm-input" style="padding: 8px; font-size: 12px;" value="<?php echo esc_attr($user->display_name); ?>" <?php if ($is_member) echo 'disabled style="background:#f1f5f9; cursor:not-allowed;"'; ?>>
-                        </div>
-                        <div class="sm-form-group" style="margin-bottom: 20px;">
-                            <label class="sm-label" style="font-size: 11px;">البريد الإلكتروني:</label>
-                            <input type="email" id="sm_edit_user_email" class="sm-input" style="padding: 8px; font-size: 12px;" value="<?php echo esc_attr($user->user_email); ?>" <?php if ($is_member) echo 'disabled style="background:#f1f5f9; cursor:not-allowed;"'; ?>>
-                        </div>
-                        <div class="sm-form-group" style="margin-bottom: 15px;">
-                            <label class="sm-label" style="font-size: 11px;">كلمة مرور جديدة (اختياري):</label>
-                            <input type="password" id="sm_edit_user_pass" class="sm-input" style="padding: 8px; font-size: 12px;" placeholder="********">
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="smSaveProfile()" class="sm-btn" style="flex: 1; height: 28px; font-size: 11px; padding: 0;">حفظ</button>
-                            <button onclick="document.getElementById('sm-profile-edit').style.display='none'; document.getElementById('sm-profile-view').style.display='block';" class="sm-btn sm-btn-outline" style="flex: 1; height: 28px; font-size: 11px; padding: 0;">إلغاء</button>
-                        </div>
-                    </div>
-
-                    <hr style="margin: 5px 0; border: none; border-top: 1px solid #eee;">
-                    <a href="<?php echo wp_logout_url(home_url('/sm-login')); ?>" class="sm-dropdown-item" style="color: #e53e3e;"><span class="dashicons dashicons-logout"></span> تسجيل الخروج</a>
-                </div>
+            <!-- Unified Interface via [login-page] Shortcode -->
+            <div class="sm-unified-topbar-wrap">
+                <?php echo do_shortcode('[login-page]'); ?>
             </div>
         </div>
     </div>
@@ -2481,5 +2220,14 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
 
 @media (max-width: 992px) {
     .sm-hide-mobile { display: none; }
+}
+
+@media (max-width: 768px) {
+    .sm-main-header { flex-wrap: wrap; gap: 15px; }
+    .sm-header-info-box { display: none !important; }
+    .sm-main-header .sm-btn { display: none !important; }
+    .sm-admin-layout { flex-direction: column !important; }
+    .sm-sidebar { width: 100% !important; border-left: none !important; border-bottom: 1px solid var(--sm-border-color); }
+    .sm-main-panel { padding: 15px !important; }
 }
 </style>
