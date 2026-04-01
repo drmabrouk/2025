@@ -207,6 +207,7 @@ class Syndicate_Management {
             'sm_clear_site_cache' => ['SM_Auth', 'ajax_clear_site_cache'],
             'sm_acknowledge_alert_ajax' => ['SM_Auth', 'ajax_acknowledge_alert_ajax'],
             'sm_dismiss_alert_ajax' => ['SM_Auth', 'ajax_dismiss_alert_ajax'],
+            'sm_dismiss_all_alerts_ajax' => ['SM_Auth', 'ajax_dismiss_all_alerts_ajax'],
             'sm_forgot_password_otp' => ['SM_Auth', 'ajax_forgot_password_otp'],
             'sm_reset_password_otp' => ['SM_Auth', 'ajax_reset_password_otp'],
             'sm_activate_account_step1' => ['SM_Auth', 'ajax_activate_account_step1'],
@@ -279,7 +280,6 @@ class Syndicate_Management {
         $this->loader->add_action('template_redirect', $plugin_public, 'handle_frontend_redirection');
         $this->loader->add_filter('login_redirect', $plugin_public, 'custom_login_redirect', 10, 3);
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-        $this->loader->add_action('wp_footer', $plugin_public, 'inject_global_alerts');
         $this->loader->add_action('init', $plugin_public, 'register_shortcodes');
         $this->loader->add_filter('the_content', $plugin_public, 'append_cover_v2_to_homepage');
         $this->loader->add_action('template_redirect', $plugin_public, 'handle_form_submission');
