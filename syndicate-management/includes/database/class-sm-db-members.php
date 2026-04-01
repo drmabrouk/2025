@@ -466,6 +466,7 @@ class SM_DB_Members {
                     ['user_login' => $member->national_id],
                     ['ID' => $member->wp_user_id]
                 );
+                clean_user_cache($member->wp_user_id);
                 update_user_meta($member->wp_user_id, 'sm_syndicateMemberIdAttr', $member->national_id);
             }
 

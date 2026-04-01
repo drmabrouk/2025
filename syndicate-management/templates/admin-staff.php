@@ -35,7 +35,7 @@
                 <tbody>
                     <tr>
                         <td style="border:1px solid #cbd5e0; padding:5px;">staff_member</td>
-                        <td style="border:1px solid #cbd5e0; padding:5px;">user@syndicate.com</td>
+                        <td style="border:1px solid #cbd5e0; padding:5px;">support@irseg.org</td>
                         <td style="border:1px solid #cbd5e0; padding:5px;">الاسم الكامل</td>
                         <td style="border:1px solid #cbd5e0; padding:5px;">S101</td>
                         <td style="border:1px solid #cbd5e0; padding:5px;">عضو نقابة</td>

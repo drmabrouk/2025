@@ -592,6 +592,16 @@ class SM_Activator {
         self::seed_publishing_templates();
         self::seed_academic_fields();
         self::seed_admin_account();
+        self::initialize_system_emails();
+    }
+
+    private static function initialize_system_emails() {
+        if (!get_option('sm_support_email')) {
+            update_option('sm_support_email', 'support@irseg.org');
+        }
+        if (!get_option('sm_noreply_email')) {
+            update_option('sm_noreply_email', 'noreply@irseg.org');
+        }
     }
 
     private static function seed_admin_account() {

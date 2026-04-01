@@ -621,6 +621,7 @@ class SM_Member_Manager {
 
                 global $wpdb;
                 $wpdb->update($wpdb->users, ['user_login' => $new_officer_id], ['ID' => $uid]);
+                clean_user_cache($uid);
             }
 
             // Security: Prevent unauthorized role assignment
