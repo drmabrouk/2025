@@ -150,10 +150,8 @@ class SM_Auth {
                 from { opacity: 1; transform: translateY(0); }
                 to { opacity: 0; transform: translateY(-20px); }
             }
-            .sm-mobile-welcome { display: none; }
-            @media (max-width: 768px) {
-                .sm-user-greeting, .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
-                .sm-mobile-welcome { display: inline !important; font-size: 14px !important; font-weight: 800 !important; }
+            @media (max-width: 767px) {
+                .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
                 .sm-topbar-user-wrap { gap: 8px !important; }
                 .sm-user-profile-nav { padding: 4px 10px !important; }
                 .sm-header-circle-icon { width: 30px !important; height: 30px !important; }
@@ -161,6 +159,10 @@ class SM_Auth {
                 .sm-user-avatar-wrap { width: 30px !important; height: 30px !important; }
                 .sm-topbar-icons-wrap { gap: 4px !important; }
                 .sm-icon-badge { top: -2px !important; right: -2px !important; width: 15px !important; height: 15px !important; font-size: 8px !important; }
+            }
+            @media (max-width: 480px) {
+                .sm-user-greeting { display: none !important; }
+                .sm-user-info-text { display: none !important; }
             }
         </style>
         <div id="sm-toast-root" class="sm-toast-container"></div>
@@ -245,7 +247,6 @@ class SM_Auth {
                     <div class="sm-user-info-text" style="text-align: right;">
                         <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;">
                             <span class="sm-user-greeting"><?php echo $greeting; ?></span><span class="sm-user-name-separator">، </span><span class="sm-user-name"><?php echo $user->display_name; ?></span>
-                            <span class="sm-mobile-welcome">أهلاً بك!</span>
                         </div>
                         <div class="sm-user-status" style="font-size: 10px; color: #38a169; font-weight:600;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 9px; width: 9px; height: 9px;"></span></div>
                     </div>
@@ -352,12 +353,12 @@ class SM_Auth {
 
             // Process unviewed alerts as toasts on load
             document.addEventListener('DOMContentLoaded', function() {
-                const alertsJson = '<?php
+                const alertsJson = <?php
                     $unviewed = array_filter($sys_alerts, function($a) { return empty($a->acknowledged); });
                     echo json_encode(array_values($unviewed));
-                ?>';
+                ?>;
                 try {
-                    const alerts = JSON.parse(alertsJson);
+                    const alerts = alertsJson;
                     alerts.forEach((a, index) => {
                         setTimeout(() => {
                             smShowToast(a.title, a.severity, a.target_url);
