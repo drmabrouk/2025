@@ -60,6 +60,10 @@ class SM_DB {
         return SM_DB_Members::delete_member($id);
     }
 
+    public static function restore_member($id) {
+        return SM_DB_Members::restore_member($id);
+    }
+
     public static function member_exists($nid) {
         return SM_DB_Members::member_exists($nid);
     }
