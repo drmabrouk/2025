@@ -609,6 +609,19 @@ class SM_Member_Manager {
             $uid = intval($_POST['edit_officer_id']);
             $mid = intval($_POST['member_id'] ?? 0);
             $role = sanitize_text_field($_POST['role']);
+            $new_officer_id = sanitize_text_field($_POST['officer_id']);
+
+            // Handle Username Sync for Staff
+            $u_old = get_userdata($uid);
+            if ($u_old && $new_officer_id !== get_user_meta($uid, 'sm_syndicateMemberIdAttr', true)) {
+                // Check if new ID is taken
+                if (username_exists($new_officer_id) && $u_old->user_login !== $new_officer_id) {
+                    wp_send_json_error(['message' => 'رقم القيد الجديد مسجل مسبقاً لمستخدم آخر.']);
+                }
+
+                global $wpdb;
+                $wpdb->update($wpdb->users, ['user_login' => $new_officer_id], ['ID' => $uid]);
+            }
 
             // Security: Prevent unauthorized role assignment
             if ($role === 'administrator' && !current_user_can('manage_options')) {

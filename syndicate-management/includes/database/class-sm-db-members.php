@@ -428,6 +428,21 @@ class SM_DB_Members {
         if (isset($data['registration_date'])) $update_data['registration_date'] = sanitize_text_field($data['registration_date']);
         if (isset($data['sort_order'])) $update_data['sort_order'] = intval($data['sort_order']);
 
+        // Pre-fetch old member data for comparison
+        $old_member = self::get_member_by_id($id);
+
+        // Handle National ID (Username) Sync
+        if (isset($data['national_id']) && $old_member && $data['national_id'] !== $old_member->national_id) {
+            $new_nid = sanitize_text_field($data['national_id']);
+            // Check if new ID is taken as username or by another member
+            $user_exists = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->users WHERE user_login = %s", $new_nid));
+            $member_exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table_name WHERE national_id = %s AND id != %d", $new_nid, $id));
+
+            if ($user_exists || $member_exists) {
+                return new WP_Error('duplicate_id', 'الرقم القومي الجديد مسجل مسبقاً لمستخدم آخر.');
+            }
+        }
+
         $res = $wpdb->update($table_name, $update_data, array('id' => $id));
 
         // Sync to WP User
@@ -443,6 +458,17 @@ class SM_DB_Members {
             if (count($user_data) > 1) {
                 wp_update_user($user_data);
             }
+
+            // Sync user_login with national_id
+            if (isset($data['national_id'])) {
+                $wpdb->update(
+                    $wpdb->users,
+                    ['user_login' => $member->national_id],
+                    ['ID' => $member->wp_user_id]
+                );
+                update_user_meta($member->wp_user_id, 'sm_syndicateMemberIdAttr', $member->national_id);
+            }
+
             if (isset($data['governorate'])) {
                 update_user_meta($member->wp_user_id, 'sm_governorate', sanitize_text_field($data['governorate']));
             }
