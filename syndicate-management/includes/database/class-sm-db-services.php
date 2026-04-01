@@ -127,7 +127,21 @@ class SM_DB_Services {
         if (isset($data['payment_receipt_url'])) $insert_data['payment_receipt_url'] = esc_url_raw($data['payment_receipt_url']);
 
         $res = $wpdb->insert("{$wpdb->prefix}sm_service_requests", $insert_data);
-        return $res ? $wpdb->insert_id : false;
+        if ($res) {
+            $request_id = $wpdb->insert_id;
+            $member = SM_DB_Members::get_member_by_id($data['member_id']);
+            $service = self::get_service_by_id($data['service_id']);
+            SM_DB_System::save_alert([
+                'title' => 'طلب خدمة جديد',
+                'message' => 'قام العضو ' . ($member->name ?? 'ID:'.$data['member_id']) . ' بطلب خدمة: ' . ($service->name ?? 'ID:'.$data['service_id']),
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_branch' => $member->governorate ?? '',
+                'target_url' => add_query_arg(['sm_tab' => 'digital-services', 'sub_tab' => 'requests'], home_url('/dashboard'))
+            ]);
+            return $request_id;
+        }
+        return false;
     }
 
     public static function get_service_requests($args = array()) {
@@ -180,10 +194,26 @@ class SM_DB_Services {
         $res = $wpdb->update("{$wpdb->prefix}sm_service_requests", $data, array('id' => $request_id));
 
         if ($res !== false) {
-            $req = $wpdb->get_row($wpdb->prepare("SELECT member_id FROM {$wpdb->prefix}sm_service_requests WHERE id = %d", $request_id));
+            $req = $wpdb->get_row($wpdb->prepare("SELECT service_id, member_id FROM {$wpdb->prefix}sm_service_requests WHERE id = %d", $request_id));
             if ($req) {
                 $member = SM_DB_Members::get_member_by_id($req->member_id);
+                $service = self::get_service_by_id($req->service_id);
                 SM_Finance::invalidate_financial_caches($member->governorate ?? null);
+
+                if ($member && $member->wp_user_id) {
+                    $m_user = get_userdata($member->wp_user_id);
+                    if ($m_user) {
+                        $status_map = ['approved' => 'مقبول', 'rejected' => 'مرفوض', 'processing' => 'قيد التنفيذ'];
+                        $status_text = $status_map[$status] ?? $status;
+                        SM_DB_System::save_alert([
+                            'title' => 'تحديث حالة طلب الخدمة',
+                            'message' => 'تم تغيير حالة طلبك لخدمة (' . ($service->name ?? '') . ') إلى: ' . $status_text,
+                            'severity' => ($status === 'rejected' ? 'warning' : 'info'),
+                            'target_users' => $m_user->user_login,
+                            'target_url' => home_url('/my-account')
+                        ]);
+                    }
+                }
             }
         }
 
@@ -192,12 +222,30 @@ class SM_DB_Services {
 
     public static function add_professional_request($member_id, $type) {
         global $wpdb;
-        return $wpdb->insert("{$wpdb->prefix}sm_professional_requests", array(
+        $res = $wpdb->insert("{$wpdb->prefix}sm_professional_requests", array(
             'member_id' => intval($member_id),
             'request_type' => $type,
             'status' => 'pending',
             'created_at' => current_time('mysql')
         ));
+        if ($res) {
+            $member = SM_DB_Members::get_member_by_id($member_id);
+            $type_map = [
+                'permit_test' => 'دخول امتحان مزاولة',
+                'permit_renewal' => 'تجديد تصريح مزاولة',
+                'facility_new' => 'ترخيص منشأة جديدة',
+                'facility_renewal' => 'تجديد ترخيص منشأة'
+            ];
+            SM_DB_System::save_alert([
+                'title' => 'طلب مهني جديد',
+                'message' => 'قام العضو ' . ($member->name ?? 'ID:'.$member_id) . ' بتقديم طلب: ' . ($type_map[$type] ?? $type),
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_branch' => $member->governorate ?? '',
+                'target_url' => add_query_arg('sm_tab', 'professional-requests', home_url('/dashboard'))
+            ]);
+        }
+        return $res;
     }
 
     public static function get_professional_requests($args = []) {
@@ -240,7 +288,7 @@ class SM_DB_Services {
 
     public static function process_professional_request($id, $status, $notes = '') {
         global $wpdb;
-        return $wpdb->update(
+        $res = $wpdb->update(
             "{$wpdb->prefix}sm_professional_requests",
             array(
                 'status' => $status,
@@ -250,5 +298,25 @@ class SM_DB_Services {
             ),
             array('id' => intval($id))
         );
+        if ($res) {
+            $req = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}sm_professional_requests WHERE id = %d", $id));
+            if ($req) {
+                $member = SM_DB_Members::get_member_by_id($req->member_id);
+                if ($member && $member->wp_user_id) {
+                    $m_user = get_userdata($member->wp_user_id);
+                    if ($m_user) {
+                        $status_text = ($status === 'approved' ? 'مقبول' : 'مرفوض');
+                        SM_DB_System::save_alert([
+                            'title' => 'تحديث طلب مهني',
+                            'message' => 'تم ' . $status_text . ' طلبك المهني رقم: ' . $id,
+                            'severity' => ($status === 'approved' ? 'info' : 'warning'),
+                            'target_users' => $m_user->user_login,
+                            'target_url' => home_url('/my-account')
+                        ]);
+                    }
+                }
+            }
+        }
+        return $res;
     }
 }

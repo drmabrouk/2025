@@ -163,40 +163,58 @@ class SM_Auth {
                             $member_by_wp = SM_DB_Members::get_member_by_wp_user_id($user->ID);
                             if ($member_by_wp) {
                                 if ($member_by_wp->last_paid_membership_year < date('Y')) {
-                                    $notif_alerts[] = ['text' => 'يوجد متأخرات في تجديد العضوية السنوية', 'type' => 'warning'];
+                                    $notif_alerts[] = [
+                                        'text' => 'يوجد متأخرات في تجديد العضوية السنوية',
+                                        'type' => 'warning',
+                                        'id' => 0,
+                                        'target_url' => home_url('/my-account')
+                                    ];
                                 }
                             }
                         }
                         if (current_user_can('sm_manage_members')) {
                             $pending_updates = SM_DB_Members::count_pending_update_requests();
                             if ($pending_updates > 0) {
-                                $notif_alerts[] = ['text' => 'يوجد ' . $pending_updates . ' طلبات تحديث بيانات بانتظار المراجعة', 'type' => 'info'];
+                                $notif_alerts[] = [
+                                    'text' => 'يوجد ' . $pending_updates . ' طلبات تحديث بيانات بانتظار المراجعة',
+                                    'type' => 'info',
+                                    'id' => 0,
+                                    'target_url' => add_query_arg('sm_tab', 'update-requests', home_url('/dashboard'))
+                                ];
                             }
                         }
                         $sys_alerts = SM_DB::get_active_alerts_for_user($user->ID);
                         foreach($sys_alerts as $sa) {
-                            $notif_alerts[] = ['text' => $sa->title, 'type' => 'system', 'id' => $sa->id, 'details' => $sa->message];
+                            $notif_alerts[] = [
+                                'text' => $sa->title,
+                                'type' => 'system',
+                                'id' => $sa->id,
+                                'details' => $sa->message,
+                                'target_url' => $sa->target_url ?? ''
+                            ];
                         }
                         if (count($notif_alerts) > 0): ?>
                             <span class="sm-icon-badge" style="position:absolute; top:-4px; right:-4px; background:#f6ad55; color:#fff; font-size:9px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; font-weight:800;"><?php echo count($notif_alerts); ?></span>
                         <?php endif; ?>
                     </a>
-                    <div id="sm-notifications-menu" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 100000; padding: 20px; text-align:right;">
+                    <div id="sm-notifications-menu" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 100000; padding: 20px; text-align:right;">
                         <h4 style="margin: 0 0 15px 0; font-size: 14px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-weight:900; color:var(--sm-dark-color);">التنبيهات والإشعارات</h4>
                         <div style="max-height: 350px; overflow-y: auto;">
                             <?php if (empty($notif_alerts)): ?>
                                 <div style="font-size: 12px; color: #94a3b8; text-align: center; padding: 20px;">لا توجد تنبيهات جديدة حالياً</div>
                             <?php else: ?>
                                 <?php foreach ($notif_alerts as $a): ?>
-                                    <div style="font-size: 12px; padding: 10px 0; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 12px; align-items: flex-start;">
-                                        <span class="dashicons <?php echo $a['type'] == 'system' ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo $a['type'] == 'system' ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
-                                        <span>
+                                    <div style="font-size: 12px; padding: 10px 0; border-bottom: 1px solid #f9fafb; color: #4a5568; display: flex; gap: 12px; align-items: flex-start; position: relative;">
+                                        <span class="dashicons <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'dashicons-megaphone' : 'dashicons-warning'; ?>" style="font-size: 16px; color: <?php echo (isset($a['type']) && $a['type'] == 'system') ? 'var(--sm-primary-color)' : '#d69e2e'; ?>;"></span>
+                                        <span style="flex: 1; cursor: pointer;" onclick="smAcknowledgeAlert(<?php echo intval($a['id']); ?>, '<?php echo esc_js($a['target_url'] ?? ''); ?>')">
                                             <strong style="display:block; margin-bottom:4px; color:var(--sm-dark-color);"><?php echo esc_html($a['text']); ?></strong>
-                                            <?php if($a['type'] == 'system'): ?>
+                                            <?php if(!empty($a['details'])): ?>
                                                 <div style="font-size:10px; color:#718096; margin-bottom:8px; line-height:1.5;"><?php echo esc_html(mb_strimwidth(strip_tags($a['details']), 0, 100, "...")); ?></div>
-                                                <a href="javascript:smAcknowledgeAlert(<?php echo intval($a['id']); ?>)" style="font-size:10px; color:var(--sm-primary-color); font-weight:800; text-decoration:none;">عرض التفاصيل / إغلاق</a>
                                             <?php endif; ?>
                                         </span>
+                                        <a href="javascript:smDismissAlert(<?php echo intval($a['id']); ?>)" style="color: #cbd5e0; text-decoration: none; margin-right: 5px;" title="حذف">
+                                            <span class="dashicons dashicons-no-alt" style="font-size: 16px; width: 16px; height: 16px;"></span>
+                                        </a>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -293,8 +311,28 @@ class SM_Auth {
                     menu.style.display = 'none';
                 }
             };
-            window.smAcknowledgeAlert = function(id) {
+            window.smAcknowledgeAlert = function(id, redirectUrl = '') {
+                if (id === 0) {
+                    if (redirectUrl) window.location.href = redirectUrl;
+                    return;
+                }
                 const action = 'sm_acknowledge_alert_ajax';
+                const formData = new FormData();
+                formData.append('action', action);
+                formData.append('alert_id', id);
+                formData.append('nonce', '<?php echo wp_create_nonce("sm_profile_action"); ?>');
+                fetch(ajaxurl + '?action=' + action, { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(res => {
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    } else {
+                        location.reload();
+                    }
+                });
+            };
+            window.smDismissAlert = function(id) {
+                const action = 'sm_dismiss_alert_ajax';
                 const formData = new FormData();
                 formData.append('action', action);
                 formData.append('alert_id', id);
@@ -546,14 +584,25 @@ class SM_Auth {
             $alert_id = intval($_POST['alert_id'] ?? 0);
             if (!$alert_id) wp_send_json_error(['message' => 'ID التنبيه غير صحيح']);
 
-            global $wpdb;
-            $wpdb->insert($wpdb->prefix . 'sm_alert_views', [
-                'alert_id' => $alert_id,
-                'user_id' => $user_id,
-                'acknowledged' => 1,
-                'created_at' => current_time('mysql')
-            ]);
+            SM_DB::acknowledge_alert($alert_id, $user_id);
             wp_send_json_success('تم تأكيد استلام التنبيه');
+        } catch (Throwable $e) {
+            wp_send_json_error(['message' => $e->getMessage()]);
+        }
+    }
+
+    public static function ajax_dismiss_alert_ajax() {
+        try {
+            if (!is_user_logged_in()) {
+                wp_send_json_error(['message' => 'يجب تسجيل الدخول أولاً']);
+            }
+            check_ajax_referer('sm_profile_action', 'nonce');
+            $user_id = get_current_user_id();
+            $alert_id = intval($_POST['alert_id'] ?? 0);
+            if (!$alert_id) wp_send_json_error(['message' => 'ID التنبيه غير صحيح']);
+
+            SM_DB::dismiss_alert($alert_id, $user_id);
+            wp_send_json_success('تم حذف التنبيه');
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }

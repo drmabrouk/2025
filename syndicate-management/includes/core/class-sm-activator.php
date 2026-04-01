@@ -441,6 +441,8 @@ class SM_Activator {
             severity enum('info', 'warning', 'critical') DEFAULT 'info',
             must_acknowledge tinyint(1) DEFAULT 0,
             status enum('active', 'inactive') DEFAULT 'active',
+            target_url text,
+            target_branch varchar(50),
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id)
@@ -453,6 +455,7 @@ class SM_Activator {
             alert_id mediumint(9) NOT NULL,
             user_id bigint(20) NOT NULL,
             acknowledged tinyint(1) DEFAULT 0,
+            is_dismissed tinyint(1) DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             PRIMARY KEY  (id),
             KEY alert_id (alert_id),
@@ -1230,20 +1233,28 @@ class SM_Activator {
         global $wpdb;
         $table_name = $wpdb->prefix . 'sm_alerts';
 
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-            return;
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
+            $cols = [
+                'target_roles' => 'text',
+                'target_ranks' => 'text',
+                'target_users' => 'text',
+                'target_url' => 'text',
+                'target_branch' => 'varchar(50)'
+            ];
+
+            foreach ($cols as $col => $type) {
+                $exists = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM $table_name LIKE %s", $col));
+                if (empty($exists)) {
+                    $wpdb->query("ALTER TABLE $table_name ADD $col $type");
+                }
+            }
         }
 
-        $cols = [
-            'target_roles' => 'text',
-            'target_ranks' => 'text',
-            'target_users' => 'text'
-        ];
-
-        foreach ($cols as $col => $type) {
-            $exists = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM $table_name LIKE %s", $col));
+        $view_table = $wpdb->prefix . 'sm_alert_views';
+        if ($wpdb->get_var("SHOW TABLES LIKE '$view_table'") == $view_table) {
+            $exists = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM $view_table LIKE %s", 'is_dismissed'));
             if (empty($exists)) {
-                $wpdb->query("ALTER TABLE $table_name ADD $col $type AFTER status");
+                $wpdb->query("ALTER TABLE $view_table ADD is_dismissed tinyint(1) DEFAULT 0 AFTER acknowledged");
             }
         }
     }

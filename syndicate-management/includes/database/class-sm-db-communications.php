@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 class SM_DB_Communications {
     public static function send_message($sender_id, $receiver_id, $message, $member_id = null, $file_url = null, $governorate = null) {
         global $wpdb;
-        return $wpdb->insert($wpdb->prefix . 'sm_messages', array(
+        $res = $wpdb->insert($wpdb->prefix . 'sm_messages', array(
             'sender_id' => $sender_id,
             'receiver_id' => $receiver_id,
             'member_id' => $member_id,
@@ -15,6 +15,20 @@ class SM_DB_Communications {
             'governorate' => $governorate,
             'created_at' => current_time('mysql')
         ));
+        if ($res) {
+            $sender = get_userdata($sender_id);
+            $receiver = get_userdata($receiver_id);
+            if ($receiver) {
+                SM_DB_System::save_alert([
+                    'title' => 'رسالة جديدة',
+                    'message' => 'لقد استلمت رسالة جديدة من: ' . ($sender ? $sender->display_name : 'النظام'),
+                    'severity' => 'info',
+                    'target_users' => $receiver->user_login,
+                    'target_url' => home_url('/dashboard?sm_tab=messaging') // Fallback URL
+                ]);
+            }
+        }
+        return $res;
     }
 
     public static function get_ticket_messages($member_id) {
@@ -187,6 +201,40 @@ class SM_DB_Communications {
         ));
         if ($res) {
             $wpdb->update("{$wpdb->prefix}sm_tickets", array('updated_at' => current_time('mysql')), array('id' => intval($data['ticket_id'])));
+
+            // Notify the opposite party
+            $ticket = self::get_ticket($data['ticket_id']);
+            $sender = get_userdata($data['sender_id']);
+
+            if ($ticket) {
+                $member = SM_DB_Members::get_member_by_id($ticket->member_id);
+                // If sender is member, notify staff
+                if ($member && $member->wp_user_id == $data['sender_id']) {
+                    SM_DB_System::save_alert([
+                        'title' => 'رد جديد على تذكرة',
+                        'message' => 'رد جديد من العضو ' . $member->name . ' على تذكرة: ' . $ticket->subject,
+                        'severity' => 'info',
+                        'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                        'target_branch' => $ticket->province ?? '',
+                        'target_url' => add_query_arg(['sm_tab' => 'messaging', 'action' => 'view_ticket', 'tid' => $data['ticket_id']], home_url('/dashboard'))
+                    ]);
+                } else {
+                    // Sender is staff, notify member
+                    if ($member && $member->wp_user_id) {
+                        $m_user = get_userdata($member->wp_user_id);
+                        if ($m_user) {
+                            SM_DB_System::save_alert([
+                                'title' => 'رد جديد على تذكرتك',
+                                'message' => 'وصلك رد جديد على التذكرة: ' . $ticket->subject,
+                                'severity' => 'info',
+                                'target_users' => $m_user->user_login,
+                                'target_url' => add_query_arg(['sm_tab' => 'my-profile', 'profile_tab' => 'correspondence'], home_url('/my-account'))
+                            ]);
+                        }
+                    }
+                }
+            }
+
             return $wpdb->insert_id;
         }
         return false;

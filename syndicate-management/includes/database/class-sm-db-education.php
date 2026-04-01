@@ -114,7 +114,7 @@ class SM_DB_Education {
 
     public static function save_test_response($data) {
         global $wpdb;
-        return $wpdb->insert("{$wpdb->prefix}sm_survey_responses", array(
+        $res = $wpdb->insert("{$wpdb->prefix}sm_survey_responses", array(
             'survey_id' => intval($data['survey_id']),
             'user_id' => intval($data['user_id']),
             'responses' => json_encode($data['responses']),
@@ -122,6 +122,18 @@ class SM_DB_Education {
             'status' => sanitize_text_field($data['status'] ?? 'pending'),
             'created_at' => current_time('mysql')
         ));
+        if ($res) {
+            $user = get_userdata($data['user_id']);
+            $survey = self::get_survey($data['survey_id']);
+            SM_DB_System::save_alert([
+                'title' => 'طلب دخول اختبار جديد',
+                'message' => 'قام ' . ($user->display_name ?? 'ID:'.$data['user_id']) . ' بتقديم إجابات لاختبار: ' . ($survey->title ?? 'ID:'.$data['survey_id']),
+                'severity' => 'info',
+                'target_roles' => ['administrator', 'sm_general_officer', 'sm_branch_officer'],
+                'target_url' => add_query_arg(['sm_tab' => 'practice-tests', 'sub_tab' => 'results'], home_url('/dashboard'))
+            ]);
+        }
+        return $res;
     }
 
     public static function get_survey($id) {
