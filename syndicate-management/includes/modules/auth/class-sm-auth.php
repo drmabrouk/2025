@@ -125,9 +125,10 @@ class SM_Auth {
             @media (max-width: 480px) {
                 .sm-user-greeting { display: none !important; }
                 .sm-user-info-text { display: none !important; }
+                .sm-topbar-icons-wrap { display: none !important; }
             }
         </style>
-        <div class="sm-topbar-user-wrap" style="position:relative; display:flex; align-items:center; gap:12px; margin:0; padding:0;" dir="rtl">
+        <div class="sm-topbar-user-wrap" style="position:relative; display:flex; align-items:center; gap:12px; margin:0; padding:0; background:transparent; border:none; box-shadow:none;" dir="rtl">
 
             <div class="sm-topbar-icons-wrap" style="display: flex; gap: 8px; align-items: center;">
                 <!-- Homepage Icon -->
