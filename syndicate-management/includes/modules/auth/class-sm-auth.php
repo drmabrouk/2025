@@ -246,7 +246,7 @@ class SM_Auth {
                         <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;"><span class="sm-user-greeting"><?php echo $greeting; ?></span><span class="sm-user-name-separator">، </span><span class="sm-user-name"><?php echo $user->display_name; ?></span></div>
                         <div class="sm-user-status" style="font-size: 10px; color: #38a169; font-weight:600;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 9px; width: 9px; height: 9px;"></span></div>
                     </div>
-                    <div class="sm-user-avatar-wrap" style="width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--sm-primary-color); flex-shrink: 0; box-shadow: 0 0 0 2px rgba(246, 48, 73, 0.1);">
+                    <div id="sm-topbar-avatar" class="sm-user-avatar-wrap" style="width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--sm-primary-color); flex-shrink: 0; box-shadow: 0 0 0 2px rgba(246, 48, 73, 0.1);">
                         <?php echo get_avatar($user->ID, 34, '', '', array('style' => 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;')); ?>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ class SM_Auth {
 
                     <div id="sm-profile-view">
                         <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; background: #fcfcfc; display: flex; align-items: center; gap: 15px;">
-                            <div style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink:0;">
+                            <div id="sm-dropdown-avatar" style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink:0;">
                                 <?php echo get_avatar($user->ID, 55, '', '', array('style' => 'width: 100%; height: 100%; object-fit: cover;')); ?>
                             </div>
                             <div style="flex:1;">
@@ -397,6 +397,12 @@ class SM_Auth {
                         location.reload();
                     }
                 });
+            };
+            window.smUpdateShortcodeAvatar = function(url) {
+                const topbar = document.getElementById('sm-topbar-avatar');
+                const dropdown = document.getElementById('sm-dropdown-avatar');
+                if (topbar) topbar.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                if (dropdown) dropdown.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
             };
             window.smDismissAlert = function(id) {
                 const item = document.getElementById('sm-alert-item-' + id);

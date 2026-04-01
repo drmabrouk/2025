@@ -540,8 +540,24 @@ function smUploadMemberPhoto(memberId) {
     .then(r => r.json())
     .then(res => {
         if (res.success && res.data && res.data.photo_url) {
-            const containers = [document.getElementById('member-photo-container'), document.querySelector('.sm-sidebar-photo-container div')];
-            containers.forEach(c => { if(c) c.innerHTML = `<img src="${res.data.photo_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`; });
+            const containers = [
+                document.getElementById('member-photo-container'),
+                document.querySelector('.sm-sidebar-photo-container div'),
+                document.getElementById('sm-topbar-avatar'),
+                document.getElementById('sm-dropdown-avatar')
+            ];
+            containers.forEach(c => {
+                if(c) {
+                    if (c.id === 'sm-dropdown-avatar') {
+                        c.innerHTML = `<img src="${res.data.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                    } else {
+                        c.innerHTML = `<img src="${res.data.photo_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    }
+                }
+            });
+            if (typeof smUpdateShortcodeAvatar === 'function') {
+                smUpdateShortcodeAvatar(res.data.photo_url);
+            }
             smShowNotification('تم تحديث الصورة الشخصية بنجاح');
         } else {
             smHandleAjaxError(res);
