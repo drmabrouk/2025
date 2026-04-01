@@ -109,9 +109,23 @@ class SM_Auth {
 
         ob_start();
         ?>
+        <style>
+            @media (max-width: 767px) {
+                .sm-topbar-icons-wrap { display: none !important; }
+                .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
+                .sm-user-avatar-wrap { display: none !important; }
+                .sm-user-profile-nav { padding: 4px 10px !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+                .sm-user-greeting { font-size: 14px !important; font-weight: 800 !important; }
+            }
+            @media (max-width: 480px) {
+                .sm-user-info-text { display: none !important; }
+                .sm-user-avatar-wrap { display: block !important; border: 2px solid var(--sm-primary-color) !important; }
+                .sm-user-profile-nav { padding: 0 !important; }
+            }
+        </style>
         <div class="sm-topbar-user-wrap" style="position:relative; display:flex; align-items:center; gap:12px; margin:0; padding:0;" dir="rtl">
 
-            <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="sm-topbar-icons-wrap" style="display: flex; gap: 8px; align-items: center;">
                 <!-- Homepage Icon -->
                 <a href="<?php echo home_url(); ?>" class="sm-header-circle-icon" title="الرئيسية" style="width:34px; height:34px; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid #e2e8f0; border-radius:50%; color:#4a5568; text-decoration:none; transition:0.2s;">
                     <span class="dashicons dashicons-admin-home" style="font-size:18px; width:18px; height:18px;"></span>
@@ -193,11 +207,11 @@ class SM_Auth {
 
             <div class="sm-user-dropdown">
                 <div class="sm-user-profile-nav" onclick="smToggleUserDropdown()" style="display: flex; align-items: center; gap: 12px; background: #fff; padding: 6px 14px; border-radius: 50px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                    <div style="text-align: right;">
-                        <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;"><?php echo $greeting . '، ' . $user->display_name; ?></div>
-                        <div style="font-size: 10px; color: #38a169; font-weight:600;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 9px; width: 9px; height: 9px;"></span></div>
+                    <div class="sm-user-info-text" style="text-align: right;">
+                        <div style="font-size: 12px; font-weight: 800; color: var(--sm-dark-color); line-height: 1.2;"><span class="sm-user-greeting"><?php echo $greeting; ?></span><span class="sm-user-name-separator">، </span><span class="sm-user-name"><?php echo $user->display_name; ?></span></div>
+                        <div class="sm-user-status" style="font-size: 10px; color: #38a169; font-weight:600;">متصل الآن <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 9px; width: 9px; height: 9px;"></span></div>
                     </div>
-                    <div style="width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--sm-primary-color); flex-shrink: 0; box-shadow: 0 0 0 2px rgba(246, 48, 73, 0.1);">
+                    <div class="sm-user-avatar-wrap" style="width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--sm-primary-color); flex-shrink: 0; box-shadow: 0 0 0 2px rgba(246, 48, 73, 0.1);">
                         <?php echo get_avatar($user->ID, 34, '', '', array('style' => 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;')); ?>
                     </div>
                 </div>
