@@ -665,27 +665,41 @@ class SM_Public {
         $images = $settings['images'] ?: [SM_PLUGIN_URL . 'assets/images/default-cover.jpg'];
         $is_slider = count($images) > 1;
 
+        $login_url = home_url('/sm-login');
+        $login_label = $settings['login_btn_label'];
+
+        if (is_user_logged_in()) {
+            $is_restricted = !current_user_can('sm_branch_access') && !current_user_can('sm_full_access');
+            $login_url = $is_restricted ? home_url('/my-account') : home_url('/dashboard');
+            $login_label = $is_restricted ? 'حسابي الشخصي' : 'لوحة التحكم';
+        }
+
         ob_start();
         ?>
-        <div class="sm-cover-box" dir="rtl" style="position:relative; width:100%; height:400px; border-radius:15px; overflow:hidden; margin:0; box-shadow:none;">
+        <div class="sm-cover-box" dir="rtl" style="position:relative; width:100%; height:400px; border-radius:15px; overflow:hidden; margin:0; box-shadow:none; background: #eee;">
             <div class="sm-cover-slider" style="width:100%; height:100%; position:relative;">
                 <?php foreach($images as $idx => $img): ?>
-                    <div class="sm-cover-slide <?php echo $idx === 0 ? 'active' : ''; ?>" style="position:absolute; top:0; left:0; width:100%; height:100%; background:url('<?php echo esc_url($img); ?>') center/cover no-repeat; opacity:<?php echo $idx === 0 ? '1' : '0'; ?>; transition: opacity 1s ease-in-out; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-                        <div class="sm-cover-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; background:<?php echo esc_attr($settings['filter_color']); ?>; backdrop-filter: blur(<?php echo intval($settings['filter_intensity']); ?>px);"></div>
+                    <div class="sm-cover-slide <?php echo $idx === 0 ? 'active' : ''; ?>"
+                         style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:<?php echo $idx === 0 ? '1' : '0'; ?>; transition: opacity 1s ease-in-out; z-index: 1;">
+                        <img src="<?php echo esc_url($img); ?>"
+                             loading="<?php echo $idx === 0 ? 'eager' : 'lazy'; ?>"
+                             style="width:100%; height:100%; object-fit:cover; display:block; image-rendering: -webkit-optimize-contrast;">
                     </div>
                 <?php endforeach; ?>
+                <!-- Single Overlay for better performance -->
+                <div class="sm-cover-overlay" style="position:absolute; inset:0; background:<?php echo esc_attr($settings['filter_color']); ?>; <?php echo intval($settings['filter_intensity']) > 0 ? 'backdrop-filter: blur('.intval($settings['filter_intensity']).'px);' : ''; ?> z-index: 5;"></div>
             </div>
 
             <div class="sm-cover-content" style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 30px; z-index:10; color:#fff;">
-                <h1 class="sm-cover-title" style="font-size:1.6em; font-weight:800; margin:0; color:#fff; text-shadow:none;"><?php echo esc_html($settings['welcome_msg']); ?></h1>
+                <h1 class="sm-cover-title" style="font-size:1.6em; font-weight:800; margin:0; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"><?php echo esc_html($settings['welcome_msg']); ?></h1>
                 <?php if($settings['welcome_sub_msg']): ?>
-                    <p class="sm-cover-desc" style="font-size:14px; font-weight:400; margin:10px 0 20px 0; color:rgba(255,255,255,0.9); text-shadow:none; max-width:600px; line-height:1.5;"><?php echo esc_html($settings['welcome_sub_msg']); ?></p>
+                    <p class="sm-cover-desc" style="font-size:14px; font-weight:400; margin:10px 0 20px 0; color:rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.3); max-width:600px; line-height:1.5;"><?php echo esc_html($settings['welcome_sub_msg']); ?></p>
                 <?php else: ?>
                     <div style="height:15px;"></div>
                 <?php endif; ?>
                 <div style="display:flex; gap:10px;">
-                    <a href="<?php echo is_user_logged_in() ? home_url('/dashboard') : home_url('/sm-login'); ?>" class="sm-btn-cover" style="height:36px; padding:0 20px; font-weight:700; border-radius:8px; font-size:13px; display:flex; align-items:center; background:#fff; color:var(--sm-primary-color) !important; text-decoration:none !important; border:none; box-shadow:none;">
-                        <?php echo esc_html($settings['login_btn_label']); ?>
+                    <a href="<?php echo $login_url; ?>" class="sm-btn-cover" style="height:36px; padding:0 20px; font-weight:700; border-radius:8px; font-size:13px; display:flex; align-items:center; background:#fff; color:var(--sm-primary-color) !important; text-decoration:none !important; border:none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <?php echo esc_html($login_label); ?>
                     </a>
                     <a href="<?php echo home_url('/services'); ?>" class="sm-btn-cover" style="height:36px; padding:0 20px; font-weight:700; border-radius:8px; font-size:13px; display:flex; align-items:center; border:1px solid #fff; color:#fff !important; background:rgba(255,255,255,0.15); text-decoration:none !important; backdrop-filter:blur(5px); box-shadow:none;">
                         <?php echo esc_html($settings['services_btn_label']); ?>

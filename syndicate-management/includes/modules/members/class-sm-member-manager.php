@@ -303,10 +303,15 @@ class SM_Member_Manager {
                     }
                 }
 
-                // Password = National ID (Applied to both new and updated for strict rule compliance)
+                // User & Password Sync
                 $u = get_user_by('login', $nid);
                 if ($u) {
                     wp_set_password($nid, $u->ID);
+                    update_user_meta($u->ID, 'sm_account_status', 'active');
+                    update_user_meta($u->ID, 'sm_syndicateMemberIdAttr', $nid);
+                    if ($member_data['governorate']) {
+                        update_user_meta($u->ID, 'sm_governorate', $member_data['governorate']);
+                    }
                 }
 
             }
