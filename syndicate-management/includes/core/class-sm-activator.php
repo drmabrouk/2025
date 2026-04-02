@@ -597,6 +597,9 @@ class SM_Activator {
             view_count int DEFAULT 0,
             like_count int DEFAULT 0,
             download_count int DEFAULT 0,
+            guest_email varchar(100),
+            guest_phone varchar(20),
+            guest_country varchar(100),
             PRIMARY KEY  (id),
             KEY status (status),
             KEY university (university),
@@ -739,7 +742,10 @@ class SM_Activator {
             'supervisor' => 'varchar(255)',
             'view_count' => 'int DEFAULT 0',
             'like_count' => 'int DEFAULT 0',
-            'download_count' => 'int DEFAULT 0'
+            'download_count' => 'int DEFAULT 0',
+            'guest_email' => 'varchar(100)',
+            'guest_phone' => 'varchar(20)',
+            'guest_country' => 'varchar(100)'
         ];
 
         foreach ($cols as $col => $type) {

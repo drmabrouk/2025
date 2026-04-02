@@ -12,11 +12,21 @@ class SM_Research_Manager {
             $data = $_POST;
 
             // Validation
-            if (mb_strlen($data['title']) < 30) {
+            if (mb_strlen($data['title'] ?? '') < 30) {
                 wp_send_json_error(['message' => 'عنوان البحث يجب أن لا يقل عن 30 حرفاً']);
             }
-            if (mb_strlen($data['abstract']) < 500) {
+            if (mb_strlen($data['abstract'] ?? '') < 500) {
                 wp_send_json_error(['message' => 'ملخص البحث يجب أن لا يقل عن 500 حرفاً']);
+            }
+
+            // Guest Validation
+            if (!is_user_logged_in()) {
+                if (empty($data['guest_email']) || !is_email($data['guest_email'])) {
+                    wp_send_json_error(['message' => 'يرجى إدخال بريد إلكتروني صحيح لمتابعة الطلب']);
+                }
+                if (empty($data['guest_phone'])) {
+                    wp_send_json_error(['message' => 'يرجى إدخال رقم الهاتف للتواصل']);
+                }
             }
 
             // Multiple Authors Validation
