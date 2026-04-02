@@ -252,14 +252,14 @@ class SM_Admin {
             $policies = $_POST['policies'] ?? array();
             $data = array();
             foreach ($policies as $key => $policy) {
+                if (empty($policy['title'])) continue;
                 $data[sanitize_key($key)] = array(
                     'title' => sanitize_text_field($policy['title']),
+                    'category' => sanitize_text_field($policy['category'] ?? 'general'),
                     'content' => wp_kses_post($policy['content'])
                 );
             }
-            if (!empty($data)) {
-                SM_Settings::save_policies($data);
-            }
+            SM_Settings::save_policies($data);
             wp_redirect(add_query_arg(['sm_tab' => 'global-settings', 'sub' => 'policies', 'settings_saved' => 1], wp_get_referer()));
             exit;
         }

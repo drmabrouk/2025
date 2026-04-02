@@ -1924,33 +1924,144 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                         </div>
 
                         <div id="policies-management-tab" class="sm-internal-tab" style="display: <?php echo ($sub == 'policies') ? 'block' : 'none'; ?>;">
-                            <?php $policies = SM_Settings::get_policies(); ?>
-                            <form method="post">
+                            <?php
+                            $policies = SM_Settings::get_policies();
+                            $categories = SM_Settings::get_policy_categories();
+                            ?>
+                            <form method="post" id="sm-policies-editor-form">
                                 <?php wp_nonce_field('sm_admin_action', 'sm_admin_nonce'); ?>
                                 <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; box-shadow: var(--sm-shadow);">
-                                    <h4 style="margin: 0 0 20px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; font-weight: 800;">إدارة سياسات وقوانين النقابة</h4>
-                                    <p style="color: #64748b; font-size: 13px; margin-bottom: 25px;">يمكنك هنا تعديل نصوص سياسات الخصوصية، الشروط والأحكام، وميثاق السلوك المهني التي تظهر للأعضاء في صفحة السياسات.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+                                        <h4 style="margin: 0; font-weight: 800;">إدارة سياسات وقوانين النقابة</h4>
+                                        <div style="display:flex; gap:10px;">
+                                            <button type="button" onclick="smPreviewPolicies()" class="sm-btn sm-btn-outline" style="width:auto; padding:0 20px; font-size:12px;"><span class="dashicons dashicons-visibility" style="margin-top:4px;"></span> معاينة</button>
+                                            <button type="button" onclick="smAddNewPolicyRow()" class="sm-btn" style="width:auto; padding:0 20px; font-size:12px; background:#38a169;">+ إضافة سياسة جديدة</button>
+                                        </div>
+                                    </div>
 
-                                    <div style="display: grid; gap: 30px;">
+                                    <div id="sm-policies-list-admin" style="display: grid; gap: 20px;">
                                         <?php foreach ($policies as $key => $policy): ?>
-                                            <div style="border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; background: #f8fafc;">
-                                                <div class="sm-form-group">
-                                                    <label class="sm-label">عنوان السياسة (<?php echo $key; ?>):</label>
-                                                    <input type="text" name="policies[<?php echo $key; ?>][title]" value="<?php echo esc_attr($policy['title']); ?>" class="sm-input" style="font-weight: 700;">
+                                            <div class="sm-policy-edit-row" style="border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; background: #f8fafc; position:relative;">
+                                                <button type="button" onclick="if(confirm('هل أنت متأكد من حذف هذه السياسة؟')) this.parentElement.remove()" style="position:absolute; top:10px; left:10px; background:none; border:none; color:#e53e3e; cursor:pointer; font-size:18px;" title="حذف">&times;</button>
+                                                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:15px; margin-bottom:15px;">
+                                                    <div class="sm-form-group" style="margin-bottom:0;">
+                                                        <label class="sm-label">عنوان السياسة:</label>
+                                                        <input type="text" name="policies[<?php echo $key; ?>][title]" value="<?php echo esc_attr($policy['title']); ?>" class="sm-input" style="font-weight: 700; border-radius:10px;">
+                                                    </div>
+                                                    <div class="sm-form-group" style="margin-bottom:0;">
+                                                        <label class="sm-label">التصنيف:</label>
+                                                        <select name="policies[<?php echo $key; ?>][category]" class="sm-select" style="border-radius:10px;">
+                                                            <?php foreach($categories as $ck => $cv): ?>
+                                                                <option value="<?php echo $ck; ?>" <?php selected($policy['category'] ?? 'general', $ck); ?>><?php echo $cv; ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div class="sm-form-group" style="margin-bottom: 0;">
-                                                    <label class="sm-label">نص السياسة بالكامل:</label>
-                                                    <textarea name="policies[<?php echo $key; ?>][content]" class="sm-textarea" rows="6"><?php echo esc_textarea($policy['content']); ?></textarea>
+                                                    <label class="sm-label">نص السياسة:</label>
+                                                    <textarea name="policies[<?php echo $key; ?>][content]" class="sm-textarea" rows="4" style="border-radius:10px; font-size:13px;"><?php echo esc_textarea($policy['content']); ?></textarea>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
 
-                                    <div style="margin-top: 30px; text-align: center; position: sticky; bottom: 0; background: rgba(255,255,255,0.9); padding: 15px 0; border-top: 1px solid #eee;">
-                                        <button type="submit" name="sm_save_policies_action" class="sm-btn" style="width: auto; padding: 0 60px; height: 50px; font-weight: 800;">حفظ كافة السياسات</button>
+                                    <div style="margin-top: 30px; text-align: center; position: sticky; bottom: 0; background: rgba(255,255,255,0.95); padding: 15px 0; border-top: 1px solid #eee; z-index:100;">
+                                        <button type="submit" name="sm_save_policies_action" class="sm-btn" style="width: auto; padding: 0 60px; height: 50px; font-weight: 800; border-radius:15px;">حفظ ونشر كافة التعديلات</button>
                                     </div>
                                 </div>
                             </form>
+
+                            <!-- Policies Preview Modal -->
+                            <div id="sm-policies-preview-modal" class="sm-modal-overlay">
+                                <div class="sm-modal-content" style="max-width: 1000px; padding:0; overflow:hidden;">
+                                    <div class="sm-modal-header" style="padding:20px; margin:0; background:#f8fafc;">
+                                        <h3 style="font-weight:900;">معاينة حية للسياسات</h3>
+                                        <button class="sm-modal-close" onclick="document.getElementById('sm-policies-preview-modal').style.display='none'">&times;</button>
+                                    </div>
+                                    <div id="sm-policies-preview-body" style="padding:40px; max-height:70vh; overflow-y:auto; background:#fff;">
+                                        <!-- Preview will be rendered here via JS -->
+                                    </div>
+                                    <div style="padding:15px; background:#f8fafc; border-top:1px solid #eee; text-align:center;">
+                                        <button class="sm-btn" onclick="document.getElementById('sm-policies-preview-modal').style.display='none'" style="width:auto; padding:0 40px;">إغلاق المعاينة</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                            function smAddNewPolicyRow() {
+                                const container = document.getElementById('sm-policies-list-admin');
+                                const id = 'new_' + Date.now();
+                                const categories = <?php echo json_encode($categories); ?>;
+                                let options = '';
+                                for(const [k, v] of Object.entries(categories)) {
+                                    options += `<option value="${k}">${v}</option>`;
+                                }
+
+                                const div = document.createElement('div');
+                                div.className = 'sm-policy-edit-row';
+                                div.style.cssText = 'border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; background: #f8fafc; position:relative; animation: smFadeIn 0.3s ease; margin-bottom:10px;';
+                                div.innerHTML = `
+                                    <button type="button" onclick="if(confirm('هل أنت متأكد؟')) this.parentElement.remove()" style="position:absolute; top:10px; left:10px; background:none; border:none; color:#e53e3e; cursor:pointer; font-size:18px;" title="حذف">&times;</button>
+                                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:15px; margin-bottom:15px;">
+                                        <div class="sm-form-group" style="margin-bottom:0;">
+                                            <label class="sm-label">عنوان السياسة:</label>
+                                            <input type="text" name="policies[${id}][title]" class="sm-input" style="font-weight: 700; border-radius:10px;" placeholder="مثال: سياسة ملفات الارتباط">
+                                        </div>
+                                        <div class="sm-form-group" style="margin-bottom:0;">
+                                            <label class="sm-label">التصنيف:</label>
+                                            <select name="policies[${id}][category]" class="sm-select" style="border-radius:10px;">${options}</select>
+                                        </div>
+                                    </div>
+                                    <div class="sm-form-group" style="margin-bottom: 0;">
+                                        <label class="sm-label">نص السياسة:</label>
+                                        <textarea name="policies[${id}][content]" class="sm-textarea" rows="4" style="border-radius:10px; font-size:13px;"></textarea>
+                                    </div>
+                                `;
+                                container.appendChild(div);
+                                div.scrollIntoView({ behavior: 'smooth' });
+                            }
+
+                            function smPreviewPolicies() {
+                                const form = document.getElementById('sm-policies-editor-form');
+                                const formData = new FormData(form);
+                                const policies = [];
+                                const categories = <?php echo json_encode($categories); ?>;
+
+                                // Simple extraction for preview
+                                const rows = form.querySelectorAll('.sm-policy-edit-row');
+                                const grouped = {};
+
+                                rows.forEach(row => {
+                                    const title = row.querySelector('input[name*="[title]"]').value;
+                                    const cat = row.querySelector('select[name*="[category]"]').value;
+                                    const content = row.querySelector('textarea[name*="[content]"]').value;
+
+                                    if(!title) return;
+
+                                    if(!grouped[cat]) grouped[cat] = [];
+                                    grouped[cat].push({title, content});
+                                });
+
+                                let html = '<div class="sm-policies-container" dir="rtl">';
+                                for(const [catKey, catLabel] of Object.entries(categories)) {
+                                    if(!grouped[catKey]) continue;
+
+                                    html += `<h3 style="color:var(--sm-primary-color); border-bottom:2px solid #eee; padding-bottom:10px; margin-top:30px; font-weight:900;">${catLabel}</h3>`;
+                                    grouped[catKey].forEach(p => {
+                                        html += `
+                                            <div style="background:#fcfcfc; border:1px solid #eee; border-radius:12px; margin-bottom:10px; overflow:hidden;">
+                                                <div style="padding:15px 20px; background:#fff; font-weight:800; color:var(--sm-dark-color); border-bottom:1px solid #f9f9f9;">${p.title}</div>
+                                                <div style="padding:20px; color:#4a5568; line-height:1.7; font-size:14px;">${p.content.replace(/\n/g, '<br>')}</div>
+                                            </div>
+                                        `;
+                                    });
+                                }
+                                html += '</div>';
+
+                                document.getElementById('sm-policies-preview-body').innerHTML = html;
+                                document.getElementById('sm-policies-preview-modal').style.display = 'flex';
+                            }
+                            </script>
                         </div>
 
                         <div id="cover-box-settings" class="sm-internal-tab" style="display: <?php echo ($sub == 'cover') ? 'block' : 'none'; ?>;">

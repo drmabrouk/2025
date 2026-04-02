@@ -739,33 +739,69 @@ class SM_Public {
 
     public function shortcode_policies() {
         $policies = SM_Settings::get_policies();
+        $categories = SM_Settings::get_policy_categories();
+
+        // Group policies by category
+        $grouped = array();
+        foreach($policies as $p) {
+            $cat = $p['category'] ?? 'general';
+            $grouped[$cat][] = $p;
+        }
+
         ob_start();
         ?>
-        <div class="sm-policies-container" dir="rtl">
+        <div class="sm-policies-container" dir="rtl" style="max-width: 1000px; margin: 30px auto; padding: 0 20px;">
             <div class="sm-policies-header" style="text-align: center; margin-bottom: 40px;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: rgba(246, 48, 73, 0.08); border-radius: 25px; margin-bottom: 20px;">
-                    <span class="dashicons dashicons-shield" style="font-size: 40px; width: 40px; height: 40px; color: var(--sm-primary-color);"></span>
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 55px; height: 55px; background: rgba(246, 48, 73, 0.06); border-radius: 18px; margin-bottom: 12px;">
+                    <span class="dashicons dashicons-shield" style="font-size: 28px; width: 28px; height: 28px; color: var(--sm-primary-color);"></span>
                 </div>
-                <h2 style="font-weight: 900; font-size: 2.5em; color: var(--sm-dark-color); margin: 0;">سياسات وقوانين النقابة</h2>
-                <p style="color: #64748b; font-size: 1.1em; margin-top: 10px;">نلتزم بأعلى معايير الشفافية والمهنية في تنظيم العمل النقابي وحماية حقوق الأعضاء</p>
+                <h2 style="font-weight: 900; font-size: 1.9em; color: var(--sm-dark-color); margin: 0; letter-spacing: -0.5px;">سياسات وقوانين المنصة</h2>
+                <p style="color: #64748b; font-size: 0.95em; margin-top: 6px; font-weight: 500;">الدليل التنظيمي والميثاق المهني لنقابة الإصابات والتأهيل</p>
             </div>
 
-            <div class="sm-policies-list" style="max-width: 900px; margin: 0 auto;">
-                <?php foreach ($policies as $key => $policy): ?>
-                    <div class="sm-policy-item" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; margin-bottom: 15px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-                        <div class="sm-policy-title" onclick="smTogglePolicy(this)" style="padding: 22px 30px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: 0.2s;">
-                            <h3 style="margin: 0; font-size: 1.15em; font-weight: 800; color: var(--sm-dark-color);"><?php echo esc_html($policy['title']); ?></h3>
-                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f8fafc; display: flex; align-items: center; justify-content: center; transition: 0.3s;" class="sm-policy-icon-wrap">
-                                <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 18px; width: 18px; height: 18px; transition: 0.3s; color: #94a3b8;"></span>
+            <div class="sm-policies-layout" style="display: grid; grid-template-columns: 240px 1fr; gap: 30px; align-items: start;">
+                <!-- Sidebar Navigation -->
+                <div class="sm-policies-sidebar" style="position: sticky; top: 90px; background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #edf2f7;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 11px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">أقسام السياسات</h4>
+                    <nav style="display: grid; gap: 6px;">
+                        <?php foreach ($categories as $ck => $cv): if(empty($grouped[$ck])) continue; ?>
+                            <a href="#cat-<?php echo $ck; ?>" class="sm-policy-nav-link" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; text-decoration: none; color: #4a5568; font-weight: 600; font-size: 13px; transition: 0.3s; background: #fff; border: 1px solid #eee;">
+                                <span class="dashicons dashicons-arrow-left-alt2" style="font-size:12px; width:12px; height:12px; opacity:0.5;"></span>
+                                <?php echo esc_html($cv); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </nav>
+                </div>
+
+                <!-- Policies Content -->
+                <div class="sm-policies-content-wrap">
+                    <?php foreach ($categories as $ck => $cv): if(empty($grouped[$ck])) continue; ?>
+                        <div id="cat-<?php echo $ck; ?>" style="margin-bottom: 40px; scroll-margin-top: 100px;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                                <h3 style="margin: 0; font-size: 1.25em; font-weight: 900; color: var(--sm-primary-color);"><?php echo esc_html($cv); ?></h3>
+                                <div style="flex: 1; height: 1px; background: linear-gradient(to left, var(--sm-primary-color) 30%, transparent 100%); opacity: 0.15;"></div>
+                            </div>
+
+                            <div class="sm-policies-list" style="display: grid; gap: 10px;">
+                                <?php foreach ($grouped[$ck] as $idx => $policy): ?>
+                                    <div class="sm-policy-item" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                                        <div class="sm-policy-title" onclick="smTogglePolicy(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: 0.2s;">
+                                            <h4 style="margin: 0; font-size: 0.95em; font-weight: 800; color: var(--sm-dark-color);"><?php echo esc_html($policy['title']); ?></h4>
+                                            <div style="width: 24px; height: 24px; border-radius: 50%; background: #f8fafc; display: flex; align-items: center; justify-content: center; transition: 0.3s;" class="sm-policy-icon-wrap">
+                                                <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 14px; width: 14px; height: 14px; transition: 0.3s; color: #94a3b8;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="sm-policy-content" style="display: none; padding: 0 20px 20px 20px; line-height: 1.7; color: #4a5568; font-size: 13.5px; animation: smFadeIn 0.4s ease;">
+                                            <div style="border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                                                <?php echo nl2br(wp_kses_post($policy['content'])); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
-                        <div class="sm-policy-content" style="display: none; padding: 0 30px 30px 30px; line-height: 1.8; color: #4a5568; font-size: 15px; animation: smFadeIn 0.4s ease;">
-                            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
-                                <?php echo nl2br(wp_kses_post($policy['content'])); ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
         <script>
@@ -775,9 +811,6 @@ class SM_Public {
             const iconWrap = element.querySelector('.sm-policy-icon-wrap');
             const item = element.parentElement;
             const isVisible = content.style.display === 'block';
-
-            // Close others if needed (optional, for accordion behavior)
-            // document.querySelectorAll('.sm-policy-content').forEach(el => el.style.display = 'none');
 
             if (!isVisible) {
                 content.style.display = 'block';
@@ -795,13 +828,69 @@ class SM_Public {
                 item.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.02)';
             }
         }
+
+        // Active Link handling for Sidebar
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.sm-policy-nav-link');
+            const sections = document.querySelectorAll('.sm-policies-content-wrap > div[id^="cat-"]');
+
+            function updateActiveLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.pageYOffset >= sectionTop - 150) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', updateActiveLink);
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 110,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
         </script>
         <style>
-            @media (max-width: 768px) {
-                .sm-policies-header h2 { font-size: 1.8em !important; }
-                .sm-policy-title { padding: 18px 20px !important; }
-                .sm-policy-title h3 { font-size: 1em !important; }
-                .sm-policy-content { padding: 0 20px 25px 20px !important; font-size: 14px !important; }
+            .sm-policy-nav-link:hover {
+                border-color: var(--sm-primary-color) !important;
+                color: var(--sm-primary-color) !important;
+                background: #fff !important;
+                transform: translateX(-5px);
+            }
+            .sm-policy-nav-link.active {
+                background: var(--sm-primary-color) !important;
+                color: #fff !important;
+                border-color: var(--sm-primary-color) !important;
+            }
+            .sm-policy-item:hover { border-color: var(--sm-primary-color) !important; box-shadow: 0 8px 15px rgba(0,0,0,0.05) !important; }
+
+            @media (max-width: 992px) {
+                .sm-policies-layout { grid-template-columns: 1fr !important; }
+                .sm-policies-sidebar { position: static !important; margin-bottom: 30px; }
+                .sm-policies-sidebar nav { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            }
+            @media (max-width: 480px) {
+                .sm-policies-header h2 { font-size: 1.6em !important; }
+                .sm-policy-title { padding: 15px 20px !important; }
+                .sm-policy-title h4 { font-size: 0.95em !important; }
             }
         </style>
         <?php
