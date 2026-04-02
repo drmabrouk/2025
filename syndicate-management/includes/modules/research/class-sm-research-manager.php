@@ -34,7 +34,7 @@ class SM_Research_Manager {
                 $syndicate = SM_Settings::get_syndicate_info();
                 $admin_email = get_option('admin_email');
                 $subject = "طلب نشر بحث جديد - " . $syndicate['syndicate_name'];
-                $message = "تم استلام طلب نشر بحث جديد في المنصة العلمية.\n\n";
+                $message = "تم استلام طلب نشر بحث جديد في مركز الأبحاث والدراسات.\n\n";
                 $message .= "العنوان: " . sanitize_text_field($data['title']) . "\n";
                 $message .= "الباحث: " . sanitize_text_field($data['authors']) . "\n";
                 $message .= "رابط المراجعة: " . add_query_arg('sm_tab', 'research-studies', home_url('/dashboard')) . "\n";
@@ -121,5 +121,95 @@ class SM_Research_Manager {
         include SM_PLUGIN_DIR . 'templates/public-research-list-partial.php';
         $html = ob_get_clean();
         wp_send_json_success(['html' => $html]);
+    }
+
+    public static function ajax_print_research() {
+        if (!current_user_can('sm_branch_access')) wp_die('Unauthorized');
+        check_ajax_referer('sm_print_nonce', 'nonce');
+
+        $id = intval($_GET['id']);
+        $r = SM_DB_Research::get_research($id);
+        if (!$r) wp_die('البحث غير موجود');
+
+        $type_map = [
+            'journal_article' => 'مقال محكم',
+            'master_thesis' => 'ماجستير',
+            'phd_dissertation' => 'دكتوراه',
+            'case_study' => 'دراسة حالة',
+            'book_chapter' => 'فصل كتاب'
+        ];
+
+        $syndicate = SM_Settings::get_syndicate_info();
+        ?>
+        <!DOCTYPE html>
+        <html dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <title>طباعة بيانات البحث العلمي</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
+                .print-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                .title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 30px; }
+                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+                .info-item { border: 1px solid #eee; padding: 15px; border-radius: 8px; }
+                .info-label { font-size: 12px; color: #666; margin-bottom: 5px; font-weight: bold; }
+                .info-value { font-size: 16px; font-weight: bold; }
+                .abstract-box { border: 1px solid #eee; padding: 20px; border-radius: 8px; line-height: 1.8; }
+                @media print { .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="no-print" style="margin-bottom: 20px; text-align: left;">
+                <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer;">بدء الطباعة</button>
+            </div>
+
+            <div class="print-header">
+                <div>
+                    <h2 style="margin:0;"><?php echo esc_html($syndicate['syndicate_name']); ?></h2>
+                    <p style="margin:5px 0 0 0;">مركز الأبحاث والدراسات</p>
+                </div>
+                <?php if ($syndicate['syndicate_logo']): ?>
+                    <img src="<?php echo esc_url($syndicate['syndicate_logo']); ?>" style="max-height: 80px;">
+                <?php endif; ?>
+            </div>
+
+            <div class="title">تقرير بيانات المادة العلمية</div>
+
+            <div class="info-grid">
+                <div class="info-item" style="grid-column: span 2;">
+                    <div class="info-label">عنوان البحث / الدراسة:</div>
+                    <div class="info-value" style="font-size: 20px;"><?php echo esc_html($r->title); ?></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">المؤلفون:</div>
+                    <div class="info-value"><?php echo esc_html($r->authors); ?></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">نوع البحث:</div>
+                    <div class="info-value"><?php echo $type_map[$r->research_type] ?? $r->research_type; ?></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">الجامعة:</div>
+                    <div class="info-value"><?php echo SM_Settings::get_universities()[$r->university] ?? $r->university; ?></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">التخصص:</div>
+                    <div class="info-value"><?php echo SM_Settings::get_specializations()[$r->specialization] ?? $r->specialization; ?></div>
+                </div>
+            </div>
+
+            <div class="info-label" style="margin-bottom: 10px;">الملخص (Abstract):</div>
+            <div class="abstract-box">
+                <?php echo nl2br(esc_html($r->abstract)); ?>
+            </div>
+
+            <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 14px;">
+                <div>تاريخ التقديم: <?php echo date('Y/m/d', strtotime($r->submitted_at)); ?></div>
+                <div>توقيع المسؤول: .............................</div>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
     }
 }

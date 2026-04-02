@@ -210,6 +210,7 @@ class Syndicate_Management {
             'sm_delete_research_ajax' => ['SM_Research_Manager', 'ajax_delete_research'],
             'sm_toggle_featured_research' => ['SM_Research_Manager', 'ajax_toggle_featured_research'],
             'sm_get_researches_html' => ['SM_Research_Manager', 'ajax_get_researches_html'],
+            'sm_print_research' => ['SM_Research_Manager', 'ajax_print_research'],
 
             // Auth Module
             'sm_update_profile_ajax' => ['SM_Auth', 'ajax_update_profile'],

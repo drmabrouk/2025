@@ -618,7 +618,40 @@ class SM_Activator {
         self::seed_publishing_templates();
         self::seed_academic_fields();
         self::seed_admin_account();
+        self::seed_default_research();
         self::initialize_system_emails();
+    }
+
+    private static function seed_default_research() {
+        global $wpdb;
+        $table = $wpdb->prefix . 'sm_research';
+        $count = $wpdb->get_var("SELECT COUNT(*) FROM $table");
+        if ($count == 0) {
+            $wpdb->insert($table, [
+                'title' => 'تأثير التمارين العلاجية على تأهيل إصابات الرباط الصليبي',
+                'abstract' => 'تناولت هذه الدراسة تحليل النتائج الوظيفية للمرضى الذين خضعوا لبرنامج تأهيلي مكثف بعد جراحة الرباط الصليبي الأمامي، مع التركيز على استعادة المدى الحركي والقوة العضلية في وقت قياسي.',
+                'research_type' => 'journal_article',
+                'authors' => 'د. أحمد علي، د. سارة محمود',
+                'university' => 'cairo',
+                'department' => 'injuries',
+                'specialization' => 'sports_injuries',
+                'status' => 'approved',
+                'is_featured' => 1,
+                'submitted_at' => current_time('mysql')
+            ]);
+            $wpdb->insert($table, [
+                'title' => 'دور التغذية الرياضية في تسريع استشفاء الأنسجة العضلية',
+                'abstract' => 'دراسة شاملة حول المكملات الغذائية والأنظمة الحمضية وتأثيرها على معدلات الاستشفاء العضلي لدى رياضيي النخبة بعد المنافسات عالية الكثافة.',
+                'research_type' => 'master_thesis',
+                'authors' => 'الباحث/ محمد حسن البدري',
+                'university' => 'mansoura',
+                'department' => 'nutrition',
+                'specialization' => 'sports_nutrition',
+                'status' => 'approved',
+                'is_featured' => 0,
+                'submitted_at' => current_time('mysql')
+            ]);
+        }
     }
 
     private static function initialize_system_emails() {
@@ -1085,7 +1118,7 @@ class SM_Activator {
                 'content' => '[policies]'
             ),
             'research-studies' => array(
-                'title' => 'الأبحاث والدراسات العلمية',
+                'title' => 'مركز الأبحاث والدراسات',
                 'content' => '[research-studies]'
             )
         );
