@@ -1,12 +1,12 @@
 <?php if (!defined('ABSPATH')) exit; ?>
 <div class="sm-research-page sm-public-page" dir="rtl">
     <!-- Hero Section with Submission Action -->
-    <div class="sm-research-hero" style="background: linear-gradient(135deg, var(--sm-dark-color) 0%, #1a365d 100%); padding: 60px 20px; text-align: center; border-radius: 0 0 40px 40px; color: #fff; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+    <div class="sm-research-hero" style="background: linear-gradient(135deg, var(--sm-dark-color) 0%, #1a365d 100%); padding: 60px 20px; text-align: center; border-radius: 40px; color: #fff; margin: 20px auto 40px; max-width: 1200px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
         <div style="max-width: 800px; margin: 0 auto;">
             <div style="display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; background:rgba(255,255,255,0.1); border-radius:20px; margin-bottom:20px; backdrop-filter:blur(10px);">
                 <span class="dashicons dashicons-book-alt" style="font-size:32px; width:32px; height:32px; color:#fff;"></span>
             </div>
-            <h1 style="font-weight: 900; font-size: 2.8em; margin: 0; color:#fff;">المنصة العلمية للأبحاث والدراسات</h1>
+            <h1 style="font-weight: 900; font-size: 2.8em; margin: 0; color:#fff;">مركز الأبحاث والدراسات</h1>
             <p style="color: rgba(255,255,255,0.8); font-size: 1.1em; margin-top: 15px; font-weight: 500;">محرك بحث علمي متخصص في علوم الإصابات الرياضية والتأهيل</p>
 
             <div style="margin-top: 35px; display: flex; gap: 15px; justify-content: center;">
@@ -63,6 +63,12 @@
                     <button type="reset" onclick="setTimeout(smRefreshResearchList, 10)" class="sm-btn sm-btn-outline" style="width: 100%; font-size: 12px; height: 40px; border-radius: 10px;">إعادة تعيين الفلاتر</button>
                 </form>
             </div>
+
+            <div style="margin-top: 20px; background: #f8fafc; border-radius: 20px; padding: 25px; border: 1px solid #e2e8f0;">
+                <h5 style="margin: 0 0 10px 0; font-weight: 800; color: var(--sm-dark-color); font-size: 14px;">تحتاج مساعدة؟</h5>
+                <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.6;">إذا واجهت مشكلة في البحث أو تقديم مادة علمية، يرجى التواصل مع الدعم الفني.</p>
+                <a href="mailto:support@irseg.org" class="sm-read-more" style="margin-top: 10px; display: block;">support@irseg.org</a>
+            </div>
         </aside>
 
         <!-- Search Results -->
@@ -78,9 +84,9 @@
 </div>
 
 <!-- Submission Modal -->
-<div id="sm-research-submit-modal" class="sm-modal-overlay">
-    <div class="sm-modal-content" style="max-width: 800px; padding: 0; overflow: hidden; border-radius: 25px;">
-        <div class="sm-modal-header" style="background: #f8fafc; padding: 25px 35px; margin: 0; border-bottom: 1px solid #eee;">
+<div id="sm-research-submit-modal" class="sm-modal-overlay" style="align-items: flex-start; padding: 40px 20px; overflow-y: auto;">
+    <div class="sm-modal-content" style="max-width: 800px; padding: 0; overflow: visible; border-radius: 25px; margin: auto;">
+        <div class="sm-modal-header" style="background: #f8fafc; padding: 25px 35px; margin: 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
             <h2 style="font-weight: 900; margin: 0; font-size: 1.5em; color: var(--sm-dark-color);">تقديم مادة علمية جديدة</h2>
             <button class="sm-modal-close" onclick="document.getElementById('sm-research-submit-modal').style.display='none'">&times;</button>
         </div>
