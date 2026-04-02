@@ -90,9 +90,9 @@
 </div>
 
 <!-- NEW Scientific Submission Wizard Modal -->
-<div id="sm-research-submit-modal" class="sm-modal-overlay" style="align-items: flex-start; padding: 20px; overflow-y: auto;">
-    <div class="sm-modal-content" style="max-width: 1000px; padding: 0; overflow: visible; border-radius: 30px; margin: 40px auto; box-shadow: 0 30px 80px rgba(0,0,0,0.25);">
-        <div class="sm-modal-header" style="background: #f8fafc; padding: 25px 40px; margin: 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; border-radius: 30px 30px 0 0; display: flex; justify-content: space-between; align-items: center;">
+<div id="sm-research-submit-modal" class="sm-modal-overlay" style="align-items: flex-start; padding: 20px; overflow-y: auto; background: rgba(17, 31, 53, 0.9);">
+    <div class="sm-modal-content" style="max-width: 1100px; padding: 0; overflow: visible; border-radius: 30px; margin: 40px auto; box-shadow: 0 40px 100px rgba(0,0,0,0.4); width: 95%;">
+        <div class="sm-modal-header" style="background: #fff; padding: 30px 45px; margin: 0; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; z-index: 100; border-radius: 30px 30px 0 0; display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div style="width: 45px; height: 45px; background: var(--sm-primary-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;">
                     <span class="dashicons dashicons-cloud-upload" style="font-size: 24px; width: 24px; height: 24px;"></span>
@@ -106,12 +106,12 @@
         </div>
 
         <!-- System Overview Description -->
-        <div style="background: #fff; padding: 25px 40px; border-bottom: 1px solid #f1f5f9;">
-            <p style="margin: 0; color: #4a5568; font-size: 13.5px; line-height: 1.8; font-weight: 500;">يتيح نظام التقديم العلمي للباحثين والمتخصصين والأكاديميين تقديم أبحاثهم ودراساتهم وموادهم العلمية من خلال عملية منظمة ومراجعة مهنية. يضمن النظام دقة البيانات، والامتثال لمعايير النشر، ويسهل عملية المراجعة والنشر في بيئة متخصصة في علوم الصحة الرياضية والإصابات والتأهيل.</p>
+        <div style="background: #fff; padding: 35px 50px; border-bottom: 1px solid #f1f5f9;">
+            <p style="margin: 0; color: #4a5568; font-size: 15.5px; line-height: 2; font-weight: 500; text-align: center; max-width: 900px; margin: 0 auto;">يتيح نظام التقديم العلمي للباحثين والمتخصصين والأكاديميين تقديم أبحاثهم ودراساتهم وموادهم العلمية من خلال عملية منظمة ومراجعة مهنية. يضمن النظام دقة البيانات، والامتثال لمعايير النشر، ويسهل عملية المراجعة والنشر في بيئة متخصصة في علوم الصحة الرياضية والإصابات والتأهيل.</p>
         </div>
 
         <!-- Wizard Stepper UI -->
-        <div class="sm-wizard-stepper" style="display: flex; justify-content: space-between; padding: 30px 60px; background: #fcfcfc; border-bottom: 1px solid #eee;">
+        <div class="sm-wizard-stepper" style="display: flex; justify-content: space-between; padding: 45px 100px; background: transparent; border-bottom: 1px solid #f1f5f9;">
             <div class="sm-step-item active" data-step="1"><span>1</span><label>الاتفاقية</label></div>
             <div class="sm-step-item" data-step="2"><span>2</span><label>بيانات الباحث</label></div>
             <div class="sm-step-item" data-step="3"><span>3</span><label>تفاصيل البحث</label></div>
@@ -124,23 +124,23 @@
 
             <!-- STEP 1: Policy & Agreement -->
             <div class="sm-wizard-step" id="step-content-1">
-                <div style="padding: 40px;">
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 35px; margin-bottom: 30px; max-height: 400px; overflow-y: auto;">
-                        <h4 style="margin: 0 0 20px 0; font-weight: 900; color: var(--sm-primary-color);">اتفاقية النشر العلمي والموافقة القانونية</h4>
-                        <div style="color: #4a5568; line-height: 2; font-size: 15px; text-align: justify;">
+                <div style="padding: 45px;">
+                    <div style="background: #fff; border: 2px solid var(--sm-primary-color); border-radius: 24px; padding: 45px; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(246, 48, 73, 0.05);">
+                        <h4 style="margin: 0 0 25px 0; font-weight: 900; color: var(--sm-primary-color); font-size: 1.3em;">اتفاقية النشر العلمي والموافقة القانونية</h4>
+                        <div style="color: #2d3748; line-height: 2.2; font-size: 16px; text-align: justify; font-weight: 500;">
                             بتقديم هذه المادة العلمية، أقر بأن هذا العمل أصيل أو أنني أملك كامل الحقوق القانونية لنشره. أقر بأن البحث قد يكون قد نُشر مسبقاً أو قُدم في مكان آخر، وأوافق تماماً على عرضه ونشره ضمن المنصة للوصول العام. أصرح بأن جميع المعلومات المقدمة دقيقة وأنني أتحمل المسؤولية الكاملة عن المحتوى والتأليف وحقوق الملكية الفكرية. أوافق على أن للمنصة الحق في مراجعة الطلب أو قبوله أو رفضه وفقاً لسياساتها ومعاييرها العلمية.
                         </div>
                     </div>
-                    <label style="display: flex; align-items: center; gap: 15px; cursor: pointer; background: #fff5f5; padding: 20px; border-radius: 15px; border: 1px solid #feb2b2;">
-                        <input type="checkbox" id="policy-agree-1" style="width: 22px; height: 22px; accent-color: var(--sm-primary-color);">
-                        <strong style="color: var(--sm-dark-color); font-size: 15px;">أوافق على كافة الشروط والسياسات المذكورة أعلاه وأتحمل المسؤولية القانونية.</strong>
+                    <label style="display: flex; align-items: center; gap: 20px; cursor: pointer; background: #f8fafc; padding: 25px 35px; border-radius: 20px; border: 1px solid #e2e8f0; transition: 0.3s;">
+                        <input type="checkbox" id="policy-agree-1" style="width: 26px; height: 26px; accent-color: var(--sm-primary-color);">
+                        <strong style="color: var(--sm-dark-color); font-size: 17px; font-weight: 800;">أوافق على كافة الشروط والسياسات المذكورة أعلاه وأتحمل المسؤولية القانونية الكاملة.</strong>
                     </label>
                 </div>
             </div>
 
             <!-- STEP 2: Basic Information (Researcher Details) -->
             <div class="sm-wizard-step" id="step-content-2" style="display: none;">
-                <div style="padding: 40px;">
+                <div style="padding: 45px;">
                     <?php if(!is_user_logged_in()): ?>
                         <div style="background: #fffbeb; border: 1px solid #feebc8; border-radius: 15px; padding: 20px; margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
                             <span class="dashicons dashicons-warning" style="color: #d69e2e; font-size: 30px; width: 30px; height: 30px;"></span>
@@ -195,7 +195,7 @@
 
             <!-- STEP 3: Research Details -->
             <div class="sm-wizard-step" id="step-content-3" style="display: none;">
-                <div style="padding: 40px;">
+                <div style="padding: 45px;">
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
                         <div class="sm-form-group" style="grid-column: span 2;">
                             <input type="text" name="title" id="research_title_input" class="sm-input" required placeholder="عنوان البحث / الدراسة (30 حرفاً على الأقل)..." style="font-weight: 700; height: 50px;">
@@ -244,7 +244,7 @@
 
             <!-- STEP 4: File Upload -->
             <div class="sm-wizard-step" id="step-content-4" style="display: none;">
-                <div style="padding: 60px 40px;">
+                <div style="padding: 80px 45px;">
                     <div id="sm-drag-drop-zone" style="border: 3px dashed #cbd5e0; border-radius: 30px; padding: 80px 40px; text-align: center; transition: 0.3s; background: #fcfcfc; cursor: pointer;">
                         <div style="width: 80px; height: 80px; background: rgba(246, 48, 73, 0.08); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
                             <span class="dashicons dashicons-upload" style="font-size: 40px; width: 40px; height: 40px; color: var(--sm-primary-color);"></span>
@@ -263,18 +263,18 @@
 
             <!-- STEP 5: Review & Confirmation -->
             <div class="sm-wizard-step" id="step-content-5" style="display: none;">
-                <div style="padding: 40px;">
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 35px;">
-                        <h4 style="margin: 0 0 25px 0; font-weight: 900; border-bottom: 2px solid #edf2f7; padding-bottom: 15px; color: var(--sm-dark-color);">مراجعة نهائية للبيانات</h4>
+                <div style="padding: 45px;">
+                    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 30px; padding: 45px; box-shadow: 0 10px 25px rgba(0,0,0,0.02);">
+                        <h4 style="margin: 0 0 30px 0; font-weight: 900; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; color: var(--sm-dark-color); font-size: 1.3em;">مراجعة نهائية واعتماد المادة العلمية</h4>
 
-                        <div id="submission-preview-area" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; font-size: 14px;">
+                        <div id="submission-preview-area" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; font-size: 15px;">
                             <!-- Preview will be populated via JS -->
                         </div>
 
-                        <div style="margin-top: 40px; padding-top: 25px; border-top: 2px solid #edf2f7;">
-                            <label style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
-                                <input type="checkbox" id="policy-agree-final" style="width: 20px; height: 20px; accent-color: var(--sm-primary-color);">
-                                <span style="font-weight: 800; color: var(--sm-dark-color);">أؤكد موافقتي النهائية على اتفاقية النشر وصحة كافة البيانات المدخلة.</span>
+                        <div style="margin-top: 50px; padding: 30px; background: #fff5f5; border-radius: 20px; border: 1px solid #feb2b2;">
+                            <label style="display: flex; align-items: center; gap: 20px; cursor: pointer;">
+                                <input type="checkbox" id="policy-agree-final" style="width: 24px; height: 24px; accent-color: var(--sm-primary-color);">
+                                <span style="font-weight: 900; color: #c53030; font-size: 16px;">أؤكد مراجعة كافة البيانات المذكورة أعلاه، وموافقتي النهائية على شروط النشر وسياسة الملكية الفكرية.</span>
                             </label>
                         </div>
                     </div>
@@ -379,19 +379,35 @@ function smPopulateFinalReview() {
 
     let html = '';
     const labels = {
-        'title': 'عنوان البحث',
-        'research_type': 'نوع المادة',
+        'title': 'عنوان البحث / الدراسة',
+        'research_type': 'نوع المادة العلمية',
         'publication_year': 'سنة النشر',
-        'university': 'الجامعة',
-        'specialization': 'التخصص',
-        'methodology': 'المنهجية',
-        'guest_email': 'البريد الإلكتروني',
-        'doi': 'معرف DOI'
+        'university': 'الجامعة / المؤسسة',
+        'specialization': 'التخصص الدقيق',
+        'methodology': 'المنهجية العلمية',
+        'sample_size': 'عينة الدراسة',
+        'guest_email': 'بريد التواصل',
+        'guest_phone': 'هاتف التواصل',
+        'doi': 'معرف DOI',
+        'supervisor': 'المشرف العلمي',
+        'keywords': 'الكلمات المفتاحية'
+    };
+
+    const typeLabels = {
+        'journal_article': 'مقال علمي محكم',
+        'master_thesis': 'رسالة ماجستير',
+        'phd_dissertation': 'أطروحة دكتوراه',
+        'case_study': 'دراسة حالة (Case Study)',
+        'systematic_review': 'مراجعة منهجية (Systematic Review)',
+        'meta_analysis': 'تحليل شمولي (Meta-analysis)',
+        'book_chapter': 'فصل في كتاب'
     };
 
     for (let [key, value] of fd.entries()) {
         if (labels[key] && value) {
-            html += `<div><label style="color:#94a3b8; font-size:11px; display:block;">${labels[key]}:</label><strong>${value}</strong></div>`;
+            let displayValue = value;
+            if (key === 'research_type') displayValue = typeLabels[value] || value;
+            html += `<div style="background:#fff; padding:15px; border-radius:12px; border:1px solid #f1f5f9;"><label style="color:#94a3b8; font-size:11px; display:block; font-weight:700; margin-bottom:5px;">${labels[key]}:</label><strong style="color:var(--sm-dark-color); font-size:14px;">${displayValue}</strong></div>`;
         }
     }
     area.innerHTML = html;
@@ -537,13 +553,13 @@ document.addEventListener('DOMContentLoaded', () => smRefreshResearchList());
 
 <style>
 .sm-wizard-stepper { counter-reset: step; }
-.sm-step-item { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; position: relative; }
-.sm-step-item span { width: 35px; height: 35px; border-radius: 50%; background: #eee; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid #fff; box-shadow: 0 0 0 2px #eee; z-index: 2; transition: 0.3s; }
-.sm-step-item label { font-size: 11px; font-weight: 800; color: #94a3b8; }
-.sm-step-item.active span { background: var(--sm-primary-color); color: #fff; box-shadow: 0 0 0 2px var(--sm-primary-color); }
+.sm-step-item { display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1; position: relative; }
+.sm-step-item span { width: 40px; height: 40px; border-radius: 50%; background: #fff; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid #eee; z-index: 2; transition: 0.3s; position: relative; box-shadow: 0 0 0 4px #fff; }
+.sm-step-item label { font-size: 13px; font-weight: 800; color: #94a3b8; }
+.sm-step-item.active span { background: var(--sm-primary-color); color: #fff; border-color: var(--sm-primary-color); box-shadow: 0 4px 15px rgba(246, 48, 73, 0.3), 0 0 0 4px #fff; }
 .sm-step-item.active label { color: var(--sm-primary-color); }
-.sm-step-item.completed span { background: #38a169; color: #fff; box-shadow: 0 0 0 2px #38a169; }
-.sm-step-item:not(:last-child)::after { content: ''; position: absolute; top: 17px; left: -50%; width: 100%; height: 2px; background: #eee; z-index: 1; }
+.sm-step-item.completed span { background: #38a169; color: #fff; border-color: #38a169; box-shadow: 0 0 0 4px #fff; }
+.sm-step-item:not(:last-child)::after { content: ''; position: absolute; top: 20px; left: -50%; width: 100%; height: 3px; background: #eee; z-index: 1; }
 .sm-step-item.completed::after { background: #38a169; }
 
 .sm-keyword-chip { background: #EBF8FF; color: #2B6CB0; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; border: 1px solid #BEE3F8; }
@@ -558,7 +574,11 @@ document.addEventListener('DOMContentLoaded', () => smRefreshResearchList());
 @media (max-width: 992px) {
     .sm-research-header-new { flex-direction: column; text-align: center; gap: 25px; }
     .sm-research-layout { grid-template-columns: 1fr !important; }
-    .sm-wizard-stepper { padding: 30px 20px; }
+    .sm-wizard-stepper { padding: 30px 20px !important; }
     .sm-step-item label { display: none; }
+    .sm-wizard-step > div { padding: 30px 20px !important; }
+    .sm-wizard-step div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+    #submission-preview-area { grid-template-columns: 1fr !important; }
+    .sm-modal-content { width: 100% !important; margin: 0 !important; border-radius: 0 !important; }
 }
 </style>
