@@ -63,7 +63,7 @@ foreach ($results as $res):
                 <button onclick="smToggleResearchAbstract(<?php echo $res->id; ?>)" class="sm-btn sm-btn-outline" style="height: 42px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 10px; border-color: #e2e8f0; color: var(--sm-dark-color) !important;">
                     الملخص العلمي <span id="research-icon-<?php echo $res->id; ?>" class="dashicons dashicons-arrow-down-alt2" style="transition: 0.3s; margin-right: 5px;"></span>
                 </button>
-                <button onclick="smPreviewResearch('<?php echo esc_url($res->file_url); ?>', '<?php echo esc_js($res->title); ?>')" class="sm-btn" style="height: 42px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 10px; background: #2d3748;">
+                <button onclick="smPreviewResearch(<?php echo $res->id; ?>, '<?php echo esc_url($res->file_url); ?>', '<?php echo esc_js($res->title); ?>')" class="sm-btn" style="height: 42px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 10px; background: #2d3748;">
                     <span class="dashicons dashicons-visibility" style="margin-left:8px;"></span> معاينة سريعة
                 </button>
             </div>

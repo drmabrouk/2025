@@ -24,7 +24,10 @@ class SM_DB_Research {
             'publication_year' => intval($data['publication_year'] ?? date('Y')),
             'doi' => sanitize_text_field($data['doi'] ?? ''),
             'supervisor' => sanitize_text_field($data['supervisor'] ?? ''),
-            'submitted_by' => get_current_user_id(),
+            'guest_email' => sanitize_email($data['guest_email'] ?? ''),
+            'guest_phone' => sanitize_text_field($data['guest_phone'] ?? ''),
+            'guest_country' => sanitize_text_field($data['guest_country'] ?? ''),
+            'submitted_by' => get_current_user_id() ?: 0,
             'submitted_at' => current_time('mysql'),
             'status' => 'pending'
         );
