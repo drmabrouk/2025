@@ -1724,6 +1724,7 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                             <button class="sm-tab-btn <?php echo $sub == 'finance' ? 'sm-active' : ''; ?>" onclick="smOpenInternalTab('finance-settings', this)">الرسوم والغرامات</button>
                             <button class="sm-tab-btn <?php echo $sub == 'notifications' ? 'sm-active' : ''; ?>" onclick="smOpenInternalTab('notification-settings', this)">التنبيهات والبريد</button>
                             <button class="sm-tab-btn <?php echo $sub == 'cover' ? 'sm-active' : ''; ?>" onclick="smOpenInternalTab('cover-box-settings', this)">صندوق الغلاف (Cover Box)</button>
+                            <button class="sm-tab-btn <?php echo $sub == 'policies' ? 'sm-active' : ''; ?>" onclick="smOpenInternalTab('policies-management-tab', this)">سياسات المنصة</button>
                         </div>
 
                         <div id="syndicate-settings" class="sm-internal-tab" style="display: <?php echo ($sub == 'init') ? 'block' : 'none'; ?>;">
@@ -1920,6 +1921,36 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
 
                         <div id="notification-settings" class="sm-internal-tab" style="display: <?php echo ($sub == 'notifications') ? 'block' : 'none'; ?>;">
                             <?php include SM_PLUGIN_DIR . 'templates/admin-notifications.php'; ?>
+                        </div>
+
+                        <div id="policies-management-tab" class="sm-internal-tab" style="display: <?php echo ($sub == 'policies') ? 'block' : 'none'; ?>;">
+                            <?php $policies = SM_Settings::get_policies(); ?>
+                            <form method="post">
+                                <?php wp_nonce_field('sm_admin_action', 'sm_admin_nonce'); ?>
+                                <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; box-shadow: var(--sm-shadow);">
+                                    <h4 style="margin: 0 0 20px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; font-weight: 800;">إدارة سياسات وقوانين النقابة</h4>
+                                    <p style="color: #64748b; font-size: 13px; margin-bottom: 25px;">يمكنك هنا تعديل نصوص سياسات الخصوصية، الشروط والأحكام، وميثاق السلوك المهني التي تظهر للأعضاء في صفحة السياسات.</p>
+
+                                    <div style="display: grid; gap: 30px;">
+                                        <?php foreach ($policies as $key => $policy): ?>
+                                            <div style="border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; background: #f8fafc;">
+                                                <div class="sm-form-group">
+                                                    <label class="sm-label">عنوان السياسة (<?php echo $key; ?>):</label>
+                                                    <input type="text" name="policies[<?php echo $key; ?>][title]" value="<?php echo esc_attr($policy['title']); ?>" class="sm-input" style="font-weight: 700;">
+                                                </div>
+                                                <div class="sm-form-group" style="margin-bottom: 0;">
+                                                    <label class="sm-label">نص السياسة بالكامل:</label>
+                                                    <textarea name="policies[<?php echo $key; ?>][content]" class="sm-textarea" rows="6"><?php echo esc_textarea($policy['content']); ?></textarea>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+
+                                    <div style="margin-top: 30px; text-align: center; position: sticky; bottom: 0; background: rgba(255,255,255,0.9); padding: 15px 0; border-top: 1px solid #eee;">
+                                        <button type="submit" name="sm_save_policies_action" class="sm-btn" style="width: auto; padding: 0 60px; height: 50px; font-weight: 800;">حفظ كافة السياسات</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
 
                         <div id="cover-box-settings" class="sm-internal-tab" style="display: <?php echo ($sub == 'cover') ? 'block' : 'none'; ?>;">

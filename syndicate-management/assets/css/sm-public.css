@@ -881,3 +881,32 @@
     border-color: var(--sm-primary-color) !important;
     box-shadow: 0 10px 20px rgba(246, 48, 73, 0.05) !important;
 }
+
+/* Policies Shortcode Styles */
+.sm-policies-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sm-policy-item:hover {
+    border-color: var(--sm-primary-color) !important;
+}
+
+.sm-policy-title:hover {
+    background: #fcfcfc !important;
+}
+
+.sm-policy-title h3 {
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.sm-policy-item:hover .sm-policy-title h3 {
+    color: var(--sm-primary-color);
+}
+
+@keyframes smFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
