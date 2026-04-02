@@ -1053,6 +1053,10 @@ class SM_Activator {
             'verify' => array(
                 'title' => 'بوابة التحقق الرقمية',
                 'content' => '[verify]'
+            ),
+            'policies' => array(
+                'title' => 'سياسات وقوانين النقابة',
+                'content' => '[policies]'
             )
         );
 

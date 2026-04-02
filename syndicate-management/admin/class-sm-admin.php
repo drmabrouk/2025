@@ -159,6 +159,7 @@ class SM_Admin {
             !isset($_POST['sm_save_settings_unified']) &&
             !isset($_POST['sm_save_appearance']) &&
             !isset($_POST['sm_save_finance_settings']) &&
+            !isset($_POST['sm_save_policies_action']) &&
             !isset($_POST['sm_save_academic_options'])) {
             return;
         }
@@ -244,6 +245,22 @@ class SM_Admin {
                 'admin_service_fee' => floatval($_POST['admin_service_fee'])
             ]);
             wp_redirect(add_query_arg(['sm_tab' => 'global-settings', 'sub' => 'finance', 'settings_saved' => 1], wp_get_referer()));
+            exit;
+        }
+
+        if (isset($_POST['sm_save_policies_action'])) {
+            $policies = $_POST['policies'] ?? array();
+            $data = array();
+            foreach ($policies as $key => $policy) {
+                $data[sanitize_key($key)] = array(
+                    'title' => sanitize_text_field($policy['title']),
+                    'content' => wp_kses_post($policy['content'])
+                );
+            }
+            if (!empty($data)) {
+                SM_Settings::save_policies($data);
+            }
+            wp_redirect(add_query_arg(['sm_tab' => 'global-settings', 'sub' => 'policies', 'settings_saved' => 1], wp_get_referer()));
             exit;
         }
 

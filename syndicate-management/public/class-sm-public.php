@@ -110,6 +110,7 @@ class SM_Public {
         add_shortcode('contact', array($this, 'shortcode_contact'));
         add_shortcode('sm_cover', array($this, 'shortcode_cover_box'));
         add_shortcode('sm_cover_2', array($this, 'shortcode_cover_2'));
+        add_shortcode('policies', array($this, 'shortcode_policies'));
 
         add_filter('authenticate', array($this, 'custom_authenticate'), 20, 3);
         add_filter('auth_cookie_expiration', array($this, 'custom_auth_cookie_expiration'), 10, 3);
@@ -732,6 +733,77 @@ class SM_Public {
             </script>
             <?php endif; ?>
         </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function shortcode_policies() {
+        $policies = SM_Settings::get_policies();
+        ob_start();
+        ?>
+        <div class="sm-policies-container" dir="rtl">
+            <div class="sm-policies-header" style="text-align: center; margin-bottom: 40px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: rgba(246, 48, 73, 0.08); border-radius: 25px; margin-bottom: 20px;">
+                    <span class="dashicons dashicons-shield" style="font-size: 40px; width: 40px; height: 40px; color: var(--sm-primary-color);"></span>
+                </div>
+                <h2 style="font-weight: 900; font-size: 2.5em; color: var(--sm-dark-color); margin: 0;">سياسات وقوانين النقابة</h2>
+                <p style="color: #64748b; font-size: 1.1em; margin-top: 10px;">نلتزم بأعلى معايير الشفافية والمهنية في تنظيم العمل النقابي وحماية حقوق الأعضاء</p>
+            </div>
+
+            <div class="sm-policies-list" style="max-width: 900px; margin: 0 auto;">
+                <?php foreach ($policies as $key => $policy): ?>
+                    <div class="sm-policy-item" style="background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; margin-bottom: 15px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                        <div class="sm-policy-title" onclick="smTogglePolicy(this)" style="padding: 22px 30px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: 0.2s;">
+                            <h3 style="margin: 0; font-size: 1.15em; font-weight: 800; color: var(--sm-dark-color);"><?php echo esc_html($policy['title']); ?></h3>
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f8fafc; display: flex; align-items: center; justify-content: center; transition: 0.3s;" class="sm-policy-icon-wrap">
+                                <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 18px; width: 18px; height: 18px; transition: 0.3s; color: #94a3b8;"></span>
+                            </div>
+                        </div>
+                        <div class="sm-policy-content" style="display: none; padding: 0 30px 30px 30px; line-height: 1.8; color: #4a5568; font-size: 15px; animation: smFadeIn 0.4s ease;">
+                            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                                <?php echo nl2br(wp_kses_post($policy['content'])); ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <script>
+        function smTogglePolicy(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.dashicons');
+            const iconWrap = element.querySelector('.sm-policy-icon-wrap');
+            const item = element.parentElement;
+            const isVisible = content.style.display === 'block';
+
+            // Close others if needed (optional, for accordion behavior)
+            // document.querySelectorAll('.sm-policy-content').forEach(el => el.style.display = 'none');
+
+            if (!isVisible) {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+                icon.style.color = 'white';
+                iconWrap.style.background = 'var(--sm-primary-color)';
+                item.style.borderColor = 'var(--sm-primary-color)';
+                item.style.boxShadow = '0 10px 15px -3px rgba(246, 48, 73, 0.1)';
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+                icon.style.color = '#94a3b8';
+                iconWrap.style.background = '#f8fafc';
+                item.style.borderColor = '#e2e8f0';
+                item.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.02)';
+            }
+        }
+        </script>
+        <style>
+            @media (max-width: 768px) {
+                .sm-policies-header h2 { font-size: 1.8em !important; }
+                .sm-policy-title { padding: 18px 20px !important; }
+                .sm-policy-title h3 { font-size: 1em !important; }
+                .sm-policy-content { padding: 0 20px 25px 20px !important; font-size: 14px !important; }
+            }
+        </style>
         <?php
         return ob_get_clean();
     }
