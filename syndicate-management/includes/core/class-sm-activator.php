@@ -569,6 +569,32 @@ class SM_Activator {
             UNIQUE KEY slug (slug)
         ) $charset_collate;\n";
 
+        // Research & Studies Table
+        $table_name = $wpdb->prefix . 'sm_research';
+        $sql .= "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            title varchar(255) NOT NULL,
+            abstract text,
+            research_type varchar(100),
+            authors text,
+            university varchar(100),
+            department varchar(100),
+            specialization varchar(100),
+            file_url text,
+            status varchar(50) DEFAULT 'pending',
+            is_featured tinyint(1) DEFAULT 0,
+            submitted_by bigint(20),
+            submitted_at datetime DEFAULT CURRENT_TIMESTAMP,
+            approved_by bigint(20),
+            approved_at datetime,
+            admin_notes text,
+            PRIMARY KEY  (id),
+            KEY status (status),
+            KEY university (university),
+            KEY department (department),
+            KEY specialization (specialization)
+        ) $charset_collate;\n";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
@@ -1057,6 +1083,10 @@ class SM_Activator {
             'policies' => array(
                 'title' => 'سياسات وقوانين النقابة',
                 'content' => '[policies]'
+            ),
+            'research-studies' => array(
+                'title' => 'الأبحاث والدراسات العلمية',
+                'content' => '[research-studies]'
             )
         );
 

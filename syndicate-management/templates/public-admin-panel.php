@@ -1000,6 +1000,9 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                     <li class="sm-sidebar-item <?php echo $active_tab == 'branches' ? 'sm-active' : ''; ?>">
                         <a href="<?php echo add_query_arg(['sm_tab' => 'branches']); ?>" class="sm-sidebar-link"><span class="dashicons dashicons-networking"></span> قسم فروع النقابة</a>
                     </li>
+                    <li class="sm-sidebar-item <?php echo $active_tab == 'research-studies' ? 'sm-active' : ''; ?>">
+                        <a href="<?php echo add_query_arg(['sm_tab' => 'research-studies']); ?>" class="sm-sidebar-link"><span class="dashicons dashicons-book-alt"></span> الأبحاث والدراسات</a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if ($is_admin || $is_general_officer): ?>
@@ -1158,6 +1161,12 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                 case 'certificates':
                     if (current_user_can('sm_manage_members') || current_user_can('manage_options')) {
                         include SM_PLUGIN_DIR . 'templates/admin-certificates.php';
+                    }
+                    break;
+
+                case 'research-studies':
+                    if ($is_admin || $is_general_officer || $is_branch_officer) {
+                        include SM_PLUGIN_DIR . 'templates/admin-research-studies.php';
                     }
                     break;
 
