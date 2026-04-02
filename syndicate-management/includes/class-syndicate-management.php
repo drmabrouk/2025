@@ -211,6 +211,8 @@ class Syndicate_Management {
             'sm_toggle_featured_research' => ['SM_Research_Manager', 'ajax_toggle_featured_research'],
             'sm_get_researches_html' => ['SM_Research_Manager', 'ajax_get_researches_html'],
             'sm_print_research' => ['SM_Research_Manager', 'ajax_print_research'],
+            'sm_toggle_favorite_research' => ['SM_Research_Manager', 'ajax_toggle_favorite'],
+            'sm_record_research_interaction' => ['SM_Research_Manager', 'ajax_record_interaction'],
 
             // Auth Module
             'sm_update_profile_ajax' => ['SM_Auth', 'ajax_update_profile'],
@@ -234,6 +236,7 @@ class Syndicate_Management {
             'sm_forgot_password_otp', 'sm_reset_password_otp',
             'sm_activate_account_step1', 'sm_activate_account_final',
             'sm_submit_membership_request', 'sm_get_researches_html', 'sm_submit_research',
+            'sm_toggle_favorite_research', 'sm_record_research_interaction',
             'sm_submit_membership_request_stage3', 'sm_get_test_questions',
             'sm_track_membership_request',
             'sm_start_test_session', 'sm_log_test_action', 'sm_sync_test_progress'

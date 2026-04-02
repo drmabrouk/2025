@@ -588,11 +588,42 @@ class SM_Activator {
             approved_by bigint(20),
             approved_at datetime,
             admin_notes text,
+            keywords text,
+            methodology varchar(255),
+            sample_size varchar(100),
+            publication_year int,
+            doi varchar(255),
+            supervisor varchar(255),
+            view_count int DEFAULT 0,
+            like_count int DEFAULT 0,
+            download_count int DEFAULT 0,
             PRIMARY KEY  (id),
             KEY status (status),
             KEY university (university),
             KEY department (department),
             KEY specialization (specialization)
+        ) $charset_collate;\n";
+
+        // Research Favorites Table
+        $table_name = $wpdb->prefix . 'sm_research_favorites';
+        $sql .= "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            research_id mediumint(9) NOT NULL,
+            user_id bigint(20) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY research_user (research_id, user_id)
+        ) $charset_collate;\n";
+
+        // Research Authors Table
+        $table_name = $wpdb->prefix . 'sm_research_authors';
+        $sql .= "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            research_id mediumint(9) NOT NULL,
+            author_name varchar(255) NOT NULL,
+            is_main tinyint(1) DEFAULT 0,
+            PRIMARY KEY  (id),
+            KEY research_id (research_id)
         ) $charset_collate;\n";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -613,6 +644,7 @@ class SM_Activator {
         self::fix_notification_logs_schema();
         self::fix_prof_requests_schema();
         self::fix_certificates_schema();
+        self::fix_research_schema();
         self::setup_roles();
         self::seed_notification_templates();
         self::seed_publishing_templates();
@@ -689,6 +721,31 @@ class SM_Activator {
                 $user->set_role('administrator');
                 update_user_meta($user->ID, 'sm_account_status', 'active');
                 update_user_meta($user->ID, 'sm_syndicateMemberIdAttr', $username);
+            }
+        }
+    }
+
+    private static function fix_research_schema() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'sm_research';
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) return;
+
+        $cols = [
+            'keywords' => 'text',
+            'methodology' => 'varchar(255)',
+            'sample_size' => 'varchar(100)',
+            'publication_year' => 'int',
+            'doi' => 'varchar(255)',
+            'supervisor' => 'varchar(255)',
+            'view_count' => 'int DEFAULT 0',
+            'like_count' => 'int DEFAULT 0',
+            'download_count' => 'int DEFAULT 0'
+        ];
+
+        foreach ($cols as $col => $type) {
+            $exists = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM $table_name LIKE %s", $col));
+            if (empty($exists)) {
+                $wpdb->query("ALTER TABLE $table_name ADD $col $type");
             }
         }
     }

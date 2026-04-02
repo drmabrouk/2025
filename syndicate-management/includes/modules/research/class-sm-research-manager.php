@@ -11,6 +11,26 @@ class SM_Research_Manager {
 
             $data = $_POST;
 
+            // Validation
+            if (mb_strlen($data['title']) < 30) {
+                wp_send_json_error(['message' => 'عنوان البحث يجب أن لا يقل عن 30 حرفاً']);
+            }
+            if (mb_strlen($data['abstract']) < 500) {
+                wp_send_json_error(['message' => 'ملخص البحث يجب أن لا يقل عن 500 حرفاً']);
+            }
+
+            // Multiple Authors Validation
+            if (empty($data['author_list']) || !is_array($data['author_list'])) {
+                wp_send_json_error(['message' => 'يرجى إضافة مؤلف واحد على الأقل']);
+            }
+            foreach ($data['author_list'] as $name) {
+                $parts = array_filter(explode(' ', trim($name)));
+                if (count($parts) < 3) {
+                    wp_send_json_error(['message' => 'اسم المؤلف "' . $name . '" يجب أن يكون ثلاثياً على الأقل']);
+                }
+            }
+            $data['authors'] = implode('، ', $data['author_list']);
+
             if (isset($_FILES['research_file'])) {
                 if (!function_exists('wp_handle_upload')) {
                     require_once(ABSPATH . 'wp-admin/includes/file.php');
@@ -113,14 +133,36 @@ class SM_Research_Manager {
             'search' => sanitize_text_field($_GET['search'] ?? ''),
             'university' => sanitize_text_field($_GET['university'] ?? ''),
             'research_type' => sanitize_text_field($_GET['research_type'] ?? ''),
-            'specialization' => sanitize_text_field($_GET['specialization'] ?? '')
+            'specialization' => sanitize_text_field($_GET['specialization'] ?? ''),
+            'year' => sanitize_text_field($_GET['year'] ?? ''),
+            'author_search' => sanitize_text_field($_GET['author'] ?? '')
         );
 
-        $results = SM_DB_Research::get_researches($args);
+        if (!empty($_GET['show_favorites']) && is_user_logged_in()) {
+            $results = SM_DB_Research::get_user_favorites(get_current_user_id());
+        } else {
+            $results = SM_DB_Research::get_researches($args);
+        }
+
         ob_start();
         include SM_PLUGIN_DIR . 'templates/public-research-list-partial.php';
         $html = ob_get_clean();
         wp_send_json_success(['html' => $html]);
+    }
+
+    public static function ajax_toggle_favorite() {
+        if (!is_user_logged_in()) wp_send_json_error(['message' => 'يجب تسجيل الدخول أولاً']);
+        check_ajax_referer('sm_research_action', 'nonce');
+        $rid = intval($_POST['id']);
+        $res = SM_DB_Research::toggle_favorite($rid, get_current_user_id());
+        wp_send_json_success($res);
+    }
+
+    public static function ajax_record_interaction() {
+        $id = intval($_POST['id']);
+        $type = sanitize_text_field($_POST['type']);
+        SM_DB_Research::increment_metric($id, $type . '_count');
+        wp_send_json_success();
     }
 
     public static function ajax_print_research() {

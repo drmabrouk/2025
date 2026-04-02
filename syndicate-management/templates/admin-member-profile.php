@@ -155,6 +155,7 @@ $member_is_admin_role = !empty($target_user->roles) && array_intersect($target_u
                         <button class="sm-portal-nav-btn" onclick="smOpenInternalTab('document-vault', this); smLoadDocuments();"><span class="dashicons dashicons-portfolio"></span> <span>قسم الأرشيف الرقمي</span></button>
                         <button class="sm-portal-nav-btn" onclick="smOpenInternalTab('digital-services-tab', this)"><span class="dashicons dashicons-cloud"></span> <span>إدارة الخدمات الرقمية</span></button>
                         <button class="sm-portal-nav-btn" onclick="smOpenInternalTab('exams-tab', this)"><span class="dashicons dashicons-welcome-learn-more"></span> <span>امتحانات تراخيص المزاولة</span></button>
+                        <button class="sm-portal-nav-btn" onclick="smOpenInternalTab('research-contributions-tab', this)"><span class="dashicons dashicons-book-alt"></span> <span>الأبحاث والدراسات</span></button>
                     <?php endif; ?>
                 </nav>
             </div>
@@ -175,6 +176,7 @@ $member_is_admin_role = !empty($target_user->roles) && array_intersect($target_u
                 <button class="sm-tab-btn" onclick="smOpenInternalTab('messaging-hub-tab', this)"><span class="dashicons dashicons-email"></span> المراسلات والشكاوى</button>
                 <button class="sm-tab-btn" onclick="smOpenInternalTab('digital-services-tab', this)"><span class="dashicons dashicons-cloud"></span> إدارة الخدمات الرقمية</button>
                 <button class="sm-tab-btn" onclick="smOpenInternalTab('exams-tab', this)"><span class="dashicons dashicons-welcome-learn-more"></span> امتحانات تراخيص المزاولة</button>
+                <button class="sm-tab-btn" onclick="smOpenInternalTab('research-contributions-tab', this)"><span class="dashicons dashicons-book-alt"></span> الأبحاث والدراسات</button>
             <?php endif; ?>
         </div>
     <?php endif; ?>
@@ -332,6 +334,29 @@ $member_is_admin_role = !empty($target_user->roles) && array_intersect($target_u
             <h3 style="margin:0 0 10px 0; font-weight:900; color:var(--sm-dark-color);">امتحانات تراخيص المزاولة</h3>
             <p style="color:#64748b; margin-bottom: 30px; font-size:14px;">يجب اجتياز الامتحانات المقررة من النقابة العامة للحصول على أو تجديد تراخيص مزاولة المهنة والترقيات الوظيفية.</p>
             <?php include SM_PLUGIN_DIR . 'templates/public-dashboard-summary.php'; ?>
+        </div>
+    </div>
+
+    <div id="research-contributions-tab" class="sm-internal-tab" style="display: none;">
+        <div style="background:#fff; padding: 35px; border-radius:20px; border:1px solid #e2e8f0; min-height:500px; box-shadow: var(--sm-shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+                <h3 style="margin:0; font-weight:900; color:var(--sm-dark-color);">الأبحاث والدراسات العلمية</h3>
+                <a href="<?php echo home_url('/research-studies'); ?>" class="sm-btn" style="width: auto; padding: 0 20px; height: 38px; font-size: 12px;"><span class="dashicons dashicons-plus" style="margin-top: 4px;"></span> تقديم بحث جديد</a>
+            </div>
+
+            <div id="member-research-list">
+                <?php
+                $results = SM_DB_Research::get_researches(['submitted_by' => $member->wp_user_id]);
+                if (empty($results)) {
+                    echo '<div style="text-align: center; padding: 60px 20px; color: #94a3b8;">
+                            <div style="font-size: 40px; margin-bottom: 15px;">📚</div>
+                            <p>لا توجد أبحاث منشورة أو قيد المراجعة مسجلة لهذا العضو حالياً.</p>
+                          </div>';
+                } else {
+                    include SM_PLUGIN_DIR . 'templates/public-research-list-partial.php';
+                }
+                ?>
+            </div>
         </div>
     </div>
 
