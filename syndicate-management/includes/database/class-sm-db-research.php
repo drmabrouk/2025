@@ -18,13 +18,32 @@ class SM_DB_Research {
             'department' => sanitize_text_field($data['department']),
             'specialization' => sanitize_text_field($data['specialization']),
             'file_url' => esc_url_raw($data['file_url']),
+            'keywords' => sanitize_text_field($data['keywords'] ?? ''),
+            'methodology' => sanitize_text_field($data['methodology'] ?? ''),
+            'sample_size' => sanitize_text_field($data['sample_size'] ?? ''),
+            'publication_year' => intval($data['publication_year'] ?? date('Y')),
+            'doi' => sanitize_text_field($data['doi'] ?? ''),
+            'supervisor' => sanitize_text_field($data['supervisor'] ?? ''),
             'submitted_by' => get_current_user_id(),
             'submitted_at' => current_time('mysql'),
             'status' => 'pending'
         );
 
         $res = $wpdb->insert($table_name, $insert_data);
-        return $res ? $wpdb->insert_id : false;
+        if ($res) {
+            $rid = $wpdb->insert_id;
+            if (!empty($data['author_list']) && is_array($data['author_list'])) {
+                foreach ($data['author_list'] as $idx => $name) {
+                    $wpdb->insert($wpdb->prefix . 'sm_research_authors', [
+                        'research_id' => $rid,
+                        'author_name' => sanitize_text_field($name),
+                        'is_main' => ($idx === 0) ? 1 : 0
+                    ]);
+                }
+            }
+            return $rid;
+        }
+        return false;
     }
 
     public static function get_researches($args = []) {
@@ -61,10 +80,27 @@ class SM_DB_Research {
 
         if (!empty($args['search'])) {
             $s = '%' . $wpdb->esc_like($args['search']) . '%';
-            $where .= " AND (title LIKE %s OR authors LIKE %s OR abstract LIKE %s)";
+            $where .= " AND (title LIKE %s OR authors LIKE %s OR abstract LIKE %s OR keywords LIKE %s)";
             $params[] = $s;
             $params[] = $s;
             $params[] = $s;
+            $params[] = $s;
+        }
+
+        if (!empty($args['year'])) {
+            $where .= " AND publication_year = %d";
+            $params[] = intval($args['year']);
+        }
+
+        if (!empty($args['author_search'])) {
+            $s = '%' . $wpdb->esc_like($args['author_search']) . '%';
+            $where .= " AND authors LIKE %s";
+            $params[] = $s;
+        }
+
+        if (!empty($args['submitted_by'])) {
+            $where .= " AND submitted_by = %d";
+            $params[] = intval($args['submitted_by']);
         }
 
         $order = "submitted_at DESC";
@@ -103,5 +139,44 @@ class SM_DB_Research {
         $table_name = $wpdb->prefix . 'sm_research';
         $current = $wpdb->get_var($wpdb->prepare("SELECT is_featured FROM $table_name WHERE id = %d", $id));
         return $wpdb->update($table_name, array('is_featured' => !$current), array('id' => $id));
+    }
+
+    public static function increment_metric($id, $metric) {
+        global $wpdb;
+        $allowed = ['view_count', 'like_count', 'download_count'];
+        if (!in_array($metric, $allowed)) return false;
+        return $wpdb->query($wpdb->prepare(
+            "UPDATE {$wpdb->prefix}sm_research SET $metric = $metric + 1 WHERE id = %d",
+            $id
+        ));
+    }
+
+    public static function toggle_favorite($rid, $uid) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'sm_research_favorites';
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table WHERE research_id = %d AND user_id = %d", $rid, $uid));
+        if ($exists) {
+            return $wpdb->delete($table, ['id' => $exists]);
+        } else {
+            return $wpdb->insert($table, ['research_id' => $rid, 'user_id' => $uid]);
+        }
+    }
+
+    public static function is_favorite($rid, $uid) {
+        global $wpdb;
+        return $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}sm_research_favorites WHERE research_id = %d AND user_id = %d", $rid, $uid));
+    }
+
+    public static function get_user_favorites($uid) {
+        global $wpdb;
+        $query = "SELECT r.* FROM {$wpdb->prefix}sm_research r
+                  JOIN {$wpdb->prefix}sm_research_favorites f ON r.id = f.research_id
+                  WHERE f.user_id = %d ORDER BY f.created_at DESC";
+        return $wpdb->get_results($wpdb->prepare($query, $uid));
+    }
+
+    public static function get_research_authors($rid) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}sm_research_authors WHERE research_id = %d ORDER BY is_main DESC, id ASC", $rid));
     }
 }
