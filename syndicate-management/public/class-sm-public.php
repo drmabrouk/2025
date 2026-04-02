@@ -111,6 +111,7 @@ class SM_Public {
         add_shortcode('sm_cover', array($this, 'shortcode_cover_box'));
         add_shortcode('sm_cover_2', array($this, 'shortcode_cover_2'));
         add_shortcode('policies', array($this, 'shortcode_policies'));
+        add_shortcode('research-studies', array($this, 'shortcode_research_studies'));
 
         add_filter('authenticate', array($this, 'custom_authenticate'), 20, 3);
         add_filter('auth_cookie_expiration', array($this, 'custom_auth_cookie_expiration'), 10, 3);
@@ -734,6 +735,12 @@ class SM_Public {
             <?php endif; ?>
         </div>
         <?php
+        return ob_get_clean();
+    }
+
+    public function shortcode_research_studies() {
+        ob_start();
+        include SM_PLUGIN_DIR . 'templates/public-research-studies.php';
         return ob_get_clean();
     }
 

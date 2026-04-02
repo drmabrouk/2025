@@ -47,6 +47,8 @@ class Syndicate_Management {
         require_once SM_PLUGIN_DIR . 'includes/modules/system/class-sm-print-manager.php';
         require_once SM_PLUGIN_DIR . 'includes/modules/education/class-sm-certificate-manager.php';
         require_once SM_PLUGIN_DIR . 'includes/database/class-sm-db-certificates.php';
+        require_once SM_PLUGIN_DIR . 'includes/database/class-sm-db-research.php';
+        require_once SM_PLUGIN_DIR . 'includes/modules/research/class-sm-research-manager.php';
 
         // Controllers
         require_once SM_PLUGIN_DIR . 'admin/class-sm-admin.php';
@@ -202,6 +204,13 @@ class Syndicate_Management {
             'sm_get_custom_print' => ['SM_Print_Manager', 'ajax_get_custom_print'],
             'sm_run_health_check' => ['SM_Health_Check', 'ajax_run_health_check'],
 
+            // Research Module
+            'sm_submit_research' => ['SM_Research_Manager', 'ajax_submit_research'],
+            'sm_update_research_status' => ['SM_Research_Manager', 'ajax_update_research_status'],
+            'sm_delete_research_ajax' => ['SM_Research_Manager', 'ajax_delete_research'],
+            'sm_toggle_featured_research' => ['SM_Research_Manager', 'ajax_toggle_featured_research'],
+            'sm_get_researches_html' => ['SM_Research_Manager', 'ajax_get_researches_html'],
+
             // Auth Module
             'sm_update_profile_ajax' => ['SM_Auth', 'ajax_update_profile'],
             'sm_clear_site_cache' => ['SM_Auth', 'ajax_clear_site_cache'],
@@ -223,7 +232,7 @@ class Syndicate_Management {
             'sm_submit_service_request', 'sm_track_service_request',
             'sm_forgot_password_otp', 'sm_reset_password_otp',
             'sm_activate_account_step1', 'sm_activate_account_final',
-            'sm_submit_membership_request',
+            'sm_submit_membership_request', 'sm_get_researches_html', 'sm_submit_research',
             'sm_submit_membership_request_stage3', 'sm_get_test_questions',
             'sm_track_membership_request',
             'sm_start_test_session', 'sm_log_test_action', 'sm_sync_test_progress'
