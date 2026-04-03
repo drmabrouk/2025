@@ -23,27 +23,27 @@ foreach ($results as $res):
     $is_fav = is_user_logged_in() && SM_DB_Research::is_favorite($res->id, get_current_user_id());
 ?>
     <div class="sm-research-card <?php echo $res->is_featured ? 'featured' : ''; ?>" data-id="<?php echo $res->id; ?>">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 25px;">
             <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <span class="sm-badge" style="background: rgba(246, 48, 73, 0.06); color: var(--sm-primary-color); border-radius: 8px; font-weight: 800; font-size: 12px; padding: 5px 12px; border: 1px solid rgba(246, 48, 73, 0.1);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                    <span class="sm-badge" style="background: rgba(246, 48, 73, 0.06); color: var(--sm-primary-color); border-radius: 8px; font-weight: 800; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(246, 48, 73, 0.1);">
                         <?php echo $type_map[$res->research_type] ?? $res->research_type; ?>
                     </span>
-                    <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">
-                        <span class="dashicons dashicons-calendar-alt" style="font-size: 16px; width: 16px; height: 16px; margin-left: 5px; vertical-align: middle;"></span>
+                    <span style="color: #94a3b8; font-size: 11px; font-weight: 600;">
+                        <span class="dashicons dashicons-calendar-alt" style="font-size: 14px; width: 14px; height: 14px; margin-left: 5px; vertical-align: middle;"></span>
                         <?php echo $res->publication_year ?: date('Y', strtotime($res->submitted_at)); ?>
                     </span>
                 </div>
-                <h3 style="margin: 0 0 15px 0; font-weight: 900; color: var(--sm-dark-color); font-size: 1.5em; line-height: 1.4; letter-spacing: -0.5px;">
+                <h3 style="margin: 0 0 12px 0; font-weight: 900; color: var(--sm-dark-color); font-size: 1.25em; line-height: 1.4; letter-spacing: -0.3px;">
                     <?php echo esc_html($res->title); ?>
                 </h3>
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; color: #64748b; font-size: 14px; font-weight: 600;">
-                    <span style="display: flex; align-items: center; gap: 6px;"><span class="dashicons dashicons-admin-users" style="color: #cbd5e0;"></span> <?php echo esc_html($res->authors); ?></span>
-                    <span style="display: flex; align-items: center; gap: 6px;"><span class="dashicons dashicons-bank" style="color: #cbd5e0;"></span> <?php echo esc_html($uni_name); ?></span>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; color: #64748b; font-size: 13px; font-weight: 600;">
+                    <span style="display: flex; align-items: center; gap: 6px;"><span class="dashicons dashicons-admin-users" style="color: #cbd5e0; font-size: 16px; width: 16px; height: 16px;"></span> <?php echo esc_html($res->authors); ?></span>
+                    <span style="display: flex; align-items: center; gap: 6px;"><span class="dashicons dashicons-bank" style="color: #cbd5e0; font-size: 16px; width: 16px; height: 16px;"></span> <?php echo esc_html($uni_name); ?></span>
                 </div>
             </div>
 
-            <div class="sm-card-metrics" style="display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
+            <div class="sm-card-metrics" style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
                 <?php if(is_user_logged_in()): ?>
                     <button onclick="smToggleFavorite(<?php echo $res->id; ?>, this)" class="sm-btn sm-btn-outline" style="width: 40px; height: 40px; padding: 0; border-radius: 10px; border-color: #eee;">
                         <span class="dashicons <?php echo $is_fav ? 'dashicons-star-filled' : 'dashicons-star-empty'; ?>" style="color: <?php echo $is_fav ? '#d69e2e' : '#94a3b8'; ?>;"></span>
@@ -58,17 +58,17 @@ foreach ($results as $res):
             </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 5px;">
-            <div style="display: flex; gap: 12px;">
-                <button onclick="smToggleResearchAbstract(<?php echo $res->id; ?>)" class="sm-btn sm-btn-outline" style="height: 42px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 10px; border-color: #e2e8f0; color: var(--sm-dark-color) !important;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 15px; margin-top: 5px;">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="smToggleResearchAbstract(<?php echo $res->id; ?>)" class="sm-btn sm-btn-outline" style="height: 38px; padding: 0 15px; font-size: 12px; font-weight: 800; border-radius: 10px; border-color: #e2e8f0; color: var(--sm-dark-color) !important;">
                     الملخص العلمي <span id="research-icon-<?php echo $res->id; ?>" class="dashicons dashicons-arrow-down-alt2" style="transition: 0.3s; margin-right: 5px;"></span>
                 </button>
-                <button onclick="smPreviewResearch(<?php echo $res->id; ?>, '<?php echo esc_url($res->file_url); ?>', '<?php echo esc_js($res->title); ?>')" class="sm-btn" style="height: 42px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 10px; background: #2d3748;">
+                <button onclick="smPreviewResearch(<?php echo $res->id; ?>, '<?php echo esc_url($res->file_url); ?>', '<?php echo esc_js($res->title); ?>')" class="sm-btn" style="height: 38px; padding: 0 15px; font-size: 12px; font-weight: 800; border-radius: 10px; background: #2d3748;">
                     <span class="dashicons dashicons-visibility" style="margin-left:8px;"></span> معاينة سريعة
                 </button>
             </div>
 
-            <button onclick="smDownloadResearch(<?php echo $res->id; ?>, '<?php echo esc_url($res->file_url); ?>')" class="sm-btn" style="height: 42px; padding: 0 25px; font-size: 13px; font-weight: 900; border-radius: 10px; box-shadow: 0 4px 10px rgba(246, 48, 73, 0.15);">
+            <button onclick="smDownloadResearch(<?php echo $res->id; ?>, '<?php echo esc_url($res->file_url); ?>')" class="sm-btn" style="height: 38px; padding: 0 20px; font-size: 12px; font-weight: 900; border-radius: 10px; box-shadow: 0 4px 10px rgba(246, 48, 73, 0.15);">
                 <span class="dashicons dashicons-download" style="margin-left:8px;"></span> تحميل النسخة الكاملة (PDF)
             </button>
         </div>

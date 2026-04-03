@@ -15,6 +15,9 @@
                 استكشاف الأبحاث
             </a>
             <?php if(is_user_logged_in()): ?>
+                <button onclick="smToggleMyResearch(this)" class="sm-btn sm-btn-outline" style="height: 48px; padding: 0 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 800; font-size: 13px; color: #64748b !important;">
+                    <span class="dashicons dashicons-admin-users" style="margin-left:5px; color: #94a3b8;"></span> أبحاثي المنشورة
+                </button>
                 <button onclick="smToggleFavoritesOnly(this)" class="sm-btn sm-btn-outline" style="height: 48px; width: 48px; padding: 0; border-radius: 12px; border: 2px solid #e2e8f0;">
                     <span class="dashicons dashicons-star-filled" style="color: #94a3b8;"></span>
                 </button>
@@ -30,6 +33,7 @@
 
                 <form id="sm-research-filter-form">
                     <input type="hidden" name="show_favorites" value="0">
+                    <input type="hidden" name="only_mine" value="0">
 
                     <div class="sm-form-group">
                         <input type="text" name="search" placeholder="عنوان البحث أو كلمات مفتاحية..." class="sm-input" oninput="smRefreshResearchList()" style="border-radius:12px; height: 45px;">
@@ -52,19 +56,25 @@
                         </select>
                     </div>
 
-                    <div class="sm-form-group">
-                        <select name="year" class="sm-select" onchange="smRefreshResearchList()" style="border-radius:12px; height: 45px;">
-                            <option value="">سنة النشر (الكل)</option>
-                            <?php for($y = date('Y'); $y >= 2000; $y--) echo "<option value='$y'>$y</option>"; ?>
-                        </select>
+                    <div id="sm-more-filters-container" style="display: none; animation: smFadeIn 0.3s ease;">
+                        <div class="sm-form-group">
+                            <select name="year" class="sm-select" onchange="smRefreshResearchList()" style="border-radius:12px; height: 45px;">
+                                <option value="">سنة النشر (الكل)</option>
+                                <?php for($y = date('Y'); $y >= 2000; $y--) echo "<option value='$y'>$y</option>"; ?>
+                            </select>
+                        </div>
+
+                        <div class="sm-form-group">
+                            <select name="specialization" class="sm-select" onchange="smRefreshResearchList()" style="border-radius:12px; height: 45px;">
+                                <option value="">كافة التخصصات</option>
+                                <?php foreach(SM_Settings::get_specializations() as $k => $v) echo "<option value='$k'>$v</option>"; ?>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="sm-form-group">
-                        <select name="specialization" class="sm-select" onchange="smRefreshResearchList()" style="border-radius:12px; height: 45px;">
-                            <option value="">كافة التخصصات</option>
-                            <?php foreach(SM_Settings::get_specializations() as $k => $v) echo "<option value='$k'>$v</option>"; ?>
-                        </select>
-                    </div>
+                    <button type="button" id="sm-toggle-filters-btn" onclick="smToggleMoreFilters()" class="sm-btn sm-btn-outline" style="width: 100%; font-size: 12px; height: 40px; border-radius: 10px; font-weight: 700; border-style: dashed; margin-bottom: 10px; color: #64748b !important;">
+                        عرض المزيد من الفلاتر <span class="dashicons dashicons-arrow-down-alt2" style="font-size:14px; width:14px; height:14px; vertical-align:middle;"></span>
+                    </button>
 
                     <button type="reset" onclick="setTimeout(smRefreshResearchList, 10)" class="sm-btn sm-btn-outline" style="width: 100%; font-size: 13px; height: 45px; border-radius: 12px; font-weight: 700; margin-top: 10px;">إعادة تعيين</button>
                 </form>
@@ -289,6 +299,34 @@
                 <button type="submit" id="submit-research-btn" class="sm-btn" style="width: auto; padding: 0 45px; height: 50px; font-weight: 900; display: none; background: #38a169;">تأكيد وإرسال المادة العلمية</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Ethics & Guidelines Modal -->
+<div id="sm-research-ethics-modal" class="sm-modal-overlay" style="align-items: center; background: rgba(17, 31, 53, 0.95);">
+    <div class="sm-modal-content" style="max-width: 600px; padding: 0; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+        <div class="sm-modal-header" style="padding: 25px 35px; background: #fff; border-bottom: 1px solid #f1f5f9; border-radius: 24px 24px 0 0;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #d97706;">
+                    <span class="dashicons dashicons-shield-check" style="font-size: 20px; width: 20px; height: 20px;"></span>
+                </div>
+                <h3 style="font-weight: 900; margin: 0; color: var(--sm-dark-color); font-size: 1.2em;">أخلاقيات البحث وسياسات النشر</h3>
+            </div>
+            <button class="sm-modal-close" onclick="document.getElementById('sm-research-ethics-modal').style.display='none'">&times;</button>
+        </div>
+        <div style="padding: 35px; background: #fff;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 25px; margin-bottom: 25px; color: #4a5568; line-height: 1.8; font-size: 14px; text-align: justify;">
+                بتحميلك لهذه المادة العلمية، أنت تقر بالالتزام بكافة معايير الأمانة العلمية وحقوق الملكية الفكرية. يُمنع استخدام المحتوى في أغراض تجارية أو إعادة نشره دون إذن كتابي من المؤلفين والنقابة. كما يجب الاقتباس والإشارة للمصدر بشكل صحيح وفقاً للأعراف الأكاديمية (APA/MLA).
+            </div>
+            <label style="display: flex; align-items: center; gap: 15px; cursor: pointer; margin-bottom: 30px;">
+                <input type="checkbox" id="sm-ethics-agree" style="width: 20px; height: 20px; accent-color: var(--sm-primary-color);">
+                <strong style="color: var(--sm-dark-color); font-size: 14px;">أوافق على سياسة النشر وأتعهد بالالتزام بالأمانة العلمية.</strong>
+            </label>
+            <div style="display: flex; gap: 12px;">
+                <button id="sm-confirm-download-btn" class="sm-btn" style="flex: 2; height: 50px; font-weight: 900; background: #38a169;">تأكيد وتحميل الملف</button>
+                <button onclick="document.getElementById('sm-research-ethics-modal').style.display='none'" class="sm-btn sm-btn-outline" style="flex: 1; height: 50px; font-weight: 800;">إلغاء</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -539,6 +577,41 @@ window.smPreviewResearch = function(id, url, title) {
     smRecordInteraction(id, 'view');
 };
 
+window.smDownloadResearch = function(id, url) {
+    const modal = document.getElementById('sm-research-ethics-modal');
+    const checkbox = document.getElementById('sm-ethics-agree');
+    const btn = document.getElementById('sm-confirm-download-btn');
+
+    checkbox.checked = false;
+    modal.style.display = 'flex';
+
+    btn.onclick = function() {
+        if (!checkbox.checked) {
+            alert('يجب الموافقة على أخلاقيات البحث وسياسات النشر للمتابعة.');
+            return;
+        }
+
+        modal.style.display = 'none';
+        smRecordInteraction(id, 'download');
+
+        // Trigger actual download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+};
+
+window.smRecordInteraction = function(id, type) {
+    const fd = new FormData();
+    fd.append('action', 'sm_record_research_interaction');
+    fd.append('id', id);
+    fd.append('type', type);
+    fetch(ajaxurl + '?action=sm_record_research_interaction', { method: 'POST', body: fd });
+};
+
 window.smToggleFavoritesOnly = function(btn) {
     const form = document.getElementById('sm-research-filter-form');
     const input = form.querySelector('input[name="show_favorites"]');
@@ -546,6 +619,38 @@ window.smToggleFavoritesOnly = function(btn) {
     if (input.value === "1") { input.value = "0"; icon.style.color = "#94a3b8"; btn.style.borderColor = "#e2e8f0"; }
     else { input.value = "1"; icon.style.color = "#d69e2e"; btn.style.borderColor = "#d69e2e"; }
     smRefreshResearchList();
+};
+
+window.smToggleMyResearch = function(btn) {
+    const form = document.getElementById('sm-research-filter-form');
+    const input = form.querySelector('input[name="only_mine"]');
+    const icon = btn.querySelector('.dashicons');
+    if (input.value === "1") {
+        input.value = "0";
+        icon.style.color = "#94a3b8";
+        btn.style.borderColor = "#e2e8f0";
+        btn.style.color = "#64748b";
+    } else {
+        input.value = "1";
+        icon.style.color = "var(--sm-primary-color)";
+        btn.style.borderColor = "var(--sm-primary-color)";
+        btn.style.color = "var(--sm-primary-color)";
+    }
+    smRefreshResearchList();
+};
+
+window.smToggleMoreFilters = function() {
+    const container = document.getElementById('sm-more-filters-container');
+    const btn = document.getElementById('sm-toggle-filters-btn');
+    const isVisible = container.style.display === 'block';
+
+    if (isVisible) {
+        container.style.display = 'none';
+        btn.innerHTML = 'عرض المزيد من الفلاتر <span class="dashicons dashicons-arrow-down-alt2" style="font-size:14px; width:14px; height:14px; vertical-align:middle;"></span>';
+    } else {
+        container.style.display = 'block';
+        btn.innerHTML = 'إخفاء الفلاتر الإضافية <span class="dashicons dashicons-arrow-up-alt2" style="font-size:14px; width:14px; height:14px; vertical-align:middle;"></span>';
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => smRefreshResearchList());
