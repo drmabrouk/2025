@@ -115,17 +115,20 @@ class SM_Auth {
             @media (max-width: 767px) {
                 .sm-user-name, .sm-user-name-separator, .sm-user-status { display: none !important; }
                 .sm-topbar-user-wrap { gap: 8px !important; }
-                .sm-user-profile-nav { padding: 4px 10px !important; }
-                .sm-header-circle-icon { width: 30px !important; height: 30px !important; }
+                .sm-user-profile-nav { padding: 6px 12px !important; }
+                .sm-header-circle-icon { width: 32px !important; height: 32px !important; }
                 .sm-header-circle-icon .dashicons { font-size: 16px !important; width: 16px !important; height: 16px !important; }
-                .sm-user-avatar-wrap { width: 30px !important; height: 30px !important; }
-                .sm-topbar-icons-wrap { gap: 4px !important; }
-                .sm-icon-badge { top: -2px !important; right: -2px !important; width: 15px !important; height: 15px !important; font-size: 8px !important; }
+                .sm-user-avatar-wrap { width: 32px !important; height: 32px !important; }
+                .sm-topbar-icons-wrap { gap: 6px !important; }
+                .sm-icon-badge { top: -2px !important; right: -2px !important; width: 14px !important; height: 14px !important; font-size: 8px !important; }
+                #sm-user-dropdown-menu { width: 280px !important; max-width: calc(100vw - 40px); right: auto !important; left: 0 !important; }
             }
             @media (max-width: 480px) {
                 .sm-user-greeting { display: none !important; }
                 .sm-user-info-text { display: none !important; }
                 .sm-topbar-icons-wrap { display: none !important; }
+                .sm-user-profile-nav { padding: 4px !important; border-radius: 50% !important; border-color: var(--sm-primary-color) !important; }
+                #sm-topbar-avatar { border: none !important; box-shadow: none !important; }
             }
         </style>
         <div class="sm-topbar-user-wrap" style="position:relative; display:flex; align-items:center; gap:12px; margin:0; padding:0; background:transparent; border:none; box-shadow:none;" dir="rtl">

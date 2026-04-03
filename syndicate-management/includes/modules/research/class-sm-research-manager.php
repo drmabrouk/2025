@@ -148,6 +148,11 @@ class SM_Research_Manager {
             'author_search' => sanitize_text_field($_GET['author'] ?? '')
         );
 
+        if (!empty($_GET['only_mine']) && is_user_logged_in()) {
+            $args['submitted_by'] = get_current_user_id();
+            unset($args['status']); // Allow seeing own pending research if needed, or keep approved only
+        }
+
         if (!empty($_GET['show_favorites']) && is_user_logged_in()) {
             $results = SM_DB_Research::get_user_favorites(get_current_user_id());
         } else {
