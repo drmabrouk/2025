@@ -101,7 +101,7 @@ class SM_Print_Manager {
                     break;
 
                 case 'practice_licenses':
-                    $title = 'سجل تصاريح تراخيص المزاولة';
+                    $title = 'سجل تصاريح مزاولة المهنة';
                     $args = ['limit' => -1, 'only_with_license' => true];
                     if (!$all_records && !empty($ids)) $args['include'] = $ids;
                     if (!$is_admin && $my_gov) $args['governorate'] = $my_gov;
@@ -178,7 +178,7 @@ class SM_Print_Manager {
                     break;
 
                 case 'surveys':
-                    $title = 'سجل امتحانات تراخيص المزاولة';
+                    $title = 'سجل امتحانات تصاريح مزاولة المهنة';
                     $results = SM_DB::get_surveys_admin();
                     if (!empty($results)) {
                         foreach ($results as $row) {

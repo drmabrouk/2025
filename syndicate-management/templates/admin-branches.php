@@ -28,7 +28,7 @@ $current_user_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true)
         $stat_items = [
             ['label' => 'إجمالي الفروع', 'value' => $mgmt_stats['total_branches'], 'icon' => 'dashicons-location', 'color' => '#3182ce'],
             ['label' => 'الأعضاء (كافة الفروع)', 'value' => $mgmt_stats['total_members'], 'icon' => 'dashicons-admin-users', 'color' => '#38a169'],
-            ['label' => 'تراخيص المزاولة', 'value' => $mgmt_stats['total_practice_licenses'], 'icon' => 'dashicons-id-alt', 'color' => '#e67e22'],
+            ['label' => 'تصاريح مزاولة المهنة', 'value' => $mgmt_stats['total_practice_licenses'], 'icon' => 'dashicons-id-alt', 'color' => '#e67e22'],
             ['label' => 'تراخيص المنشآت', 'value' => $mgmt_stats['total_facility_licenses'], 'icon' => 'dashicons-building', 'color' => '#e53e3e'],
         ];
         foreach ($stat_items as $s):

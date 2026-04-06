@@ -288,7 +288,7 @@ $show_facility = get_option('sm_verify_show_facility', 1);
 
         if (groups.profile.length > 0) renderSection('الهوية المهنية', groups.profile.map(b => getProfileCard(b.owner)));
         if (groups.membership.length > 0 && config.show_membership) renderSection('السجل النقابي', groups.membership.map(b => getMembershipCard(b.membership)));
-        if (groups.practice.length > 0 && config.show_practice) renderSection('تراخيص المزاولة', groups.practice.map(b => getPracticeCard(b.practice)));
+        if (groups.practice.length > 0 && config.show_practice) renderSection('تصاريح مزاولة المهنة', groups.practice.map(b => getPracticeCard(b.practice)));
         if (groups.facility.length > 0 && config.show_facility) renderSection('تراخيص المنشآت', groups.facility.map(b => getFacilityCard(b.facility)));
         if (groups.certificate.length > 0) renderSection('شهادات ودورات معتمدة', groups.certificate.map(b => getCertificateCard(b.certificate)));
         if (groups.tracking.length > 0) renderSection('الطلبات الرقمية', groups.tracking.map(b => getTrackingCard(b.tracking)));

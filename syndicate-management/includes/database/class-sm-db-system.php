@@ -319,17 +319,16 @@ class SM_DB_System {
             // Target Ranks check
             if ($pass && !empty($a->target_ranks)) {
                 $target_ranks = json_decode($a->target_ranks, true);
-                if (!empty($target_ranks) && !in_array($rank, $target_ranks)) $pass = false;
+                if (!empty($target_ranks) && !in_array($rank, (array)$target_ranks)) $pass = false;
             }
+
+            // Global alerts (no role/user/rank targeting)
+            if (empty($a->target_roles) && empty($a->target_users) && empty($a->target_ranks)) $pass = true;
 
             // Branch check: If alert has target_branch, and user is not full access, must match.
             if ($pass && !empty($a->target_branch) && $a->target_branch !== 'all' && !$is_full_access) {
                 if ($governorate !== $a->target_branch) $pass = false;
             }
-
-            // Global alerts (no role/user targeting) - should we allow them?
-            // If both roles and users are empty, it's public? No, usually sm_alerts are targeted.
-            if (empty($a->target_roles) && empty($a->target_users)) $pass = true;
 
             if ($pass) $filtered[] = $a;
         }
