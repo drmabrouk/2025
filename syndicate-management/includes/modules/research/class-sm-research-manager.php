@@ -46,6 +46,13 @@ class SM_Research_Manager {
                     require_once(ABSPATH . 'wp-admin/includes/file.php');
                 }
                 $uploaded_file = $_FILES['research_file'];
+
+                // Mime-type validation for security
+                $file_type = wp_check_filetype(basename($uploaded_file['name']));
+                if ($file_type['type'] !== 'application/pdf') {
+                    wp_send_json_error(['message' => 'عذراً، يجب أن يكون الملف المرفوع بصيغة PDF فقط لضمان الأمان ومعايير النشر.']);
+                }
+
                 $upload_overrides = array('test_form' => false);
                 $movefile = wp_handle_upload($uploaded_file, $upload_overrides);
 

@@ -1169,7 +1169,7 @@ class SM_Activator {
                 'shortcode' => 'sm_branches'
             ),
             'practice-test' => array(
-                'title' => 'امتحانات تراخيص المزاولة',
+                'title' => 'امتحانات تصاريح مزاولة المهنة',
                 'content' => '[test]'
             ),
             'verify' => array(
