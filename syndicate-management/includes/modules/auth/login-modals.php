@@ -17,7 +17,7 @@ $syndicate = SM_Settings::get_syndicate_info();
             <p style="font-size:13px; color:#38a169; margin-bottom:15px;">تم إرسال الرمز بنجاح. يرجى التحقق من بريدك.</p>
             <input type="text" id="rec_otp" class="sm-input" placeholder="رمز التحقق (6 أرقام)" style="margin-bottom:10px; width:100%;">
             <div class="sm-form-group" style="margin-bottom:20px; position:relative;">
-                <input type="password" id="rec_new_pass" class="sm-input" placeholder="كلمة المرور الجديدة" style="width:100%;">
+                <input type="password" id="rec_new_pass" class="sm-input" placeholder="كلمة المرور الجديدة" maxlength="20" style="width:100%;">
                 <span class="dashicons dashicons-visibility sm-password-toggle" onclick="smTogglePass('rec_new_pass', this)"></span>
             </div>
             <button onclick="smResetPassword()" class="sm-btn" style="width:100%;">تغيير كلمة المرور</button>
@@ -204,7 +204,7 @@ $syndicate = SM_Settings::get_syndicate_info();
 
         <div id="activation-step-4" style="display:none;">
             <p style="font-size:14px; color:#4a5568; margin-bottom:20px; text-align:center;">المرحلة الرابعة: تعيين كلمة المرور</p>
-            <div class="sm-form-group" style="margin-bottom:20px; position:relative;"><input type="password" id="act_pass" class="sm-input" placeholder="كلمة المرور (10 خانات على الأقل)" style="width:100%;"><span class="dashicons dashicons-visibility sm-password-toggle" onclick="smTogglePass('act_pass', this)"></span></div>
+            <div class="sm-form-group" style="margin-bottom:20px; position:relative;"><input type="password" id="act_pass" class="sm-input" placeholder="كلمة المرور (10-20 خانة)" maxlength="20" style="width:100%;"><span class="dashicons dashicons-visibility sm-password-toggle" onclick="smTogglePass('act_pass', this)"></span></div>
             <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
                 <button onclick="smActivateGoTo(3)" class="sm-btn sm-btn-outline">السابق</button>
                 <button onclick="smActivateFinal()" class="sm-btn">إكمال التنشيط والدخول</button>
@@ -420,9 +420,9 @@ function smActivateFinal() {
         else alert("يرجى إدخال بريد إلكتروني صحيح");
         return;
     }
-    if(pass.length < 10) {
-        if (typeof smShowNotification === 'function') smShowNotification("كلمة المرور يجب أن تكون 10 أحرف على الأقل", true);
-        else alert("كلمة المرور يجب أن تكون 10 أحرف على الأقل");
+    if(pass.length < 10 || pass.length > 20) {
+        if (typeof smShowNotification === 'function') smShowNotification("كلمة المرور يجب أن تكون بين 10 و 20 حرفاً", true);
+        else alert("كلمة المرور يجب أن تكون بين 10 و 20 حرفاً");
         return;
     }
     const fd = new FormData();

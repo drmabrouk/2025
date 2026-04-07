@@ -68,8 +68,8 @@ class SM_Auth {
                         'remember' => true
                     );
                     $form = wp_login_form($args);
-                    $form = str_replace('name="log"', 'name="log" placeholder="الرقم القومي أو اسم المستخدم"', $form);
-                    $form = str_replace('name="pwd"', 'name="pwd" id="sm_login_pwd" placeholder="كلمة المرور"', $form);
+                    $form = str_replace('name="log"', 'name="log" placeholder="الرقم القومي أو اسم المستخدم" maxlength="14"', $form);
+                    $form = str_replace('name="pwd"', 'name="pwd" id="sm_login_pwd" placeholder="كلمة المرور" maxlength="20"', $form);
                     // Targeted replacement using regex to avoid duplication and handle different tag endings
                     $form = preg_replace('/(<input[^>]+id="sm_login_pwd"[^>]*>)/', '$1<span class="dashicons dashicons-visibility sm-password-toggle" onclick="smTogglePass(\'sm_login_pwd\', this)"></span>', $form);
                     $form = preg_replace('/(<input[^>]+name="log"[^>]+>)\s*<span[^>]+><\/span>/', '$1', $form);
@@ -532,8 +532,8 @@ class SM_Auth {
             update_user_meta($user_id, 'sm_recovery_otp_used', 1);
             wp_send_json_error(['message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية']);
         }
-        if (strlen($new_pass) < 10 || !preg_match('/^[a-zA-Z0-9]+$/', $new_pass)) {
-            wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون 10 أحرف على الأقل وتتكون من حروف وأرقام فقط بدون رموز']);
+        if (strlen($new_pass) < 10 || strlen($new_pass) > 20 || !preg_match('/^[a-zA-Z0-9]+$/', $new_pass)) {
+            wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون بين 10 و 20 حرفاً وتتكون من حروف وأرقام فقط بدون رموز']);
         }
             wp_set_password($new_pass, $user_id);
             update_user_meta($user_id, 'sm_recovery_otp_used', 1);
@@ -587,8 +587,8 @@ class SM_Auth {
         if (!$member || $member->membership_number !== $membership_number) {
             wp_send_json_error(['message' => 'فشل التحقق من الهوية']);
         }
-        if (strlen($new_pass) < 10 || !preg_match('/^[a-zA-Z0-9]+$/', $new_pass)) {
-            wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون 10 أحرف على الأقل وتتكون من حروف وأرقام فقط']);
+        if (strlen($new_pass) < 10 || strlen($new_pass) > 20 || !preg_match('/^[a-zA-Z0-9]+$/', $new_pass)) {
+            wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون بين 10 و 20 حرفاً وتتكون من حروف وأرقام فقط']);
         }
         if (!is_email($new_email)) {
             wp_send_json_error(['message' => 'بريد إلكتروني غير صحيح']);
@@ -729,8 +729,8 @@ class SM_Auth {
         }
 
         if (!empty($pass)) {
-            if (strlen($pass) < 10) {
-                wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون 10 أحرف على الأقل']);
+            if (strlen($pass) < 10 || strlen($pass) > 20) {
+                wp_send_json_error(['message' => 'كلمة المرور يجب أن تكون بين 10 و 20 حرفاً']);
             }
             $data['user_pass'] = $pass;
         }
