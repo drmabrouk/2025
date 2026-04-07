@@ -488,6 +488,9 @@ class SM_Auth {
                 check_ajax_referer('sm_registration_nonce', 'nonce');
             }
             $national_id = sanitize_text_field($_POST['national_id'] ?? '');
+            if (strlen($national_id) > 14) {
+                wp_send_json_error(['message' => 'يجب ألا يتجاوز الرقم القومي أو اسم المستخدم 14 حرفاً']);
+            }
         $member = SM_DB::get_member_by_national_id($national_id);
         if (!$member || !$member->wp_user_id) {
             wp_send_json_error(['message' => 'الرقم القومي غير مسجل في النظام']);
@@ -518,6 +521,9 @@ class SM_Auth {
                 check_ajax_referer('sm_registration_nonce', 'nonce');
             }
             $national_id = sanitize_text_field($_POST['national_id'] ?? '');
+            if (strlen($national_id) !== 14) {
+                wp_send_json_error(['message' => 'الرقم القومي يجب أن يتكون من 14 رقماً']);
+            }
         $otp = sanitize_text_field($_POST['otp'] ?? '');
         $new_pass = $_POST['new_password'] ?? '';
         $member = SM_DB::get_member_by_national_id($national_id);
@@ -551,6 +557,9 @@ class SM_Auth {
                 check_ajax_referer('sm_registration_nonce', 'nonce');
             }
             $national_id = sanitize_text_field($_POST['national_id'] ?? '');
+            if (strlen($national_id) !== 14) {
+                wp_send_json_error(['message' => 'الرقم القومي يجب أن يتكون من 14 رقماً']);
+            }
         $membership_number = sanitize_text_field($_POST['membership_number'] ?? '');
         $branch_slug = sanitize_text_field($_POST['branch'] ?? '');
 
@@ -579,6 +588,9 @@ class SM_Auth {
                 check_ajax_referer('sm_registration_nonce', 'nonce');
             }
             $national_id = sanitize_text_field($_POST['national_id'] ?? '');
+            if (strlen($national_id) !== 14) {
+                wp_send_json_error(['message' => 'الرقم القومي يجب أن يتكون من 14 رقماً']);
+            }
         $membership_number = sanitize_text_field($_POST['membership_number'] ?? '');
         $new_email = sanitize_email($_POST['email'] ?? '');
         $new_phone = sanitize_text_field($_POST['phone'] ?? '');
