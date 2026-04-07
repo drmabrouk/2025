@@ -27,11 +27,8 @@ class SM_Service_Manager {
             $role_label = $role_names[$role] ?? $role;
         }
 
-        $is_member_role = $is_logged_in && in_array('sm_member', (array)$current_user->roles);
-        // If they have admin/officer roles, they are not "just" a member for this UI logic
-        if (current_user_can('sm_manage_members') || current_user_can('manage_options')) {
-            $is_member_role = false;
-        }
+        // Allow members and administrative staff (who have member profiles) to access services
+        $is_member_role = $is_logged_in && (in_array('sm_member', (array)$current_user->roles) || current_user_can('sm_manage_members') || current_user_can('manage_options'));
 
         $categories = ['الكل'];
         foreach ($services as $s) {

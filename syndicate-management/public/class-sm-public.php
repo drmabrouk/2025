@@ -182,26 +182,26 @@ class SM_Public {
         ob_start();
         ?>
         <div class="sm-public-page sm-branches-portal" dir="rtl">
-            <div class="sm-portal-hero" style="background:#fff; border:1px solid #e2e8f0; border-radius:30px; padding:60px 40px; margin-bottom:50px; text-align:center; box-shadow:0 10px 25px -5px rgba(0,0,0,0.05); position:relative; overflow:hidden;">
-                <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:rgba(246, 48, 73, 0.03); border-radius:50%;"></div>
+            <div class="sm-portal-hero" style="background:#fff; border:1px solid #e2e8f0; border-radius:24px; padding:35px 30px; margin-bottom:40px; text-align:center; box-shadow:0 10px 25px -5px rgba(0,0,0,0.04); position:relative; overflow:hidden;">
+                <div style="position:absolute; top:-50px; right:-50px; width:180px; height:180px; background:rgba(246, 48, 73, 0.03); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                    <div style="display:inline-flex; align-items:center; justify-content:center; width:70px; height:70px; background:rgba(246, 48, 73, 0.08); border-radius:22px; margin-bottom:25px;">
-                        <span class="dashicons dashicons-networking" style="font-size:35px; width:35px; height:35px; color:var(--sm-primary-color);"></span>
+                    <div style="display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; background:rgba(246, 48, 73, 0.07); border-radius:18px; margin-bottom:20px;">
+                        <span class="dashicons dashicons-networking" style="font-size:30px; width:30px; height:30px; color:var(--sm-primary-color);"></span>
                     </div>
-                    <h2 style="margin:0; font-weight:900; font-size:2.8em; color:var(--sm-dark-color); letter-spacing:-1px;">الفروع واللجان النقابية</h2>
-                    <p style="color:#64748b; margin-top:12px; font-size:1.1em; font-weight:500;">شبكة فروعنا ممتدة لخدمتكم في كافة محافظات الجمهورية</p>
-                    <div style="max-width:600px; margin:35px auto 0; position:relative;">
-                        <input type="text" id="sm_branch_search" placeholder="ابحث باسم المحافظة أو الفرع..." style="width:100%; height:60px; padding:0 50px 0 25px; border-radius:18px; border:2px solid #f1f5f9; background:#f8fafc; font-family:'Rubik',sans-serif; outline:none; font-size:16px; font-weight:600; transition:0.3s;" oninput="smFilterBranchesPublic(this.value)">
-                        <span class="dashicons dashicons-search" style="position:absolute; right:20px; top:18px; color:#94a3b8; font-size:24px; width:24px; height:24px;"></span>
+                    <h2 style="margin:0; font-weight:900; font-size:2.2em; color:var(--sm-dark-color); letter-spacing:-0.5px;">الفروع واللجان النقابية</h2>
+                    <p style="color:#64748b; margin-top:10px; font-size:1em; font-weight:500;">شبكة فروعنا ممتدة لخدمتكم في كافة محافظات الجمهورية</p>
+                    <div style="max-width:550px; margin:30px auto 0; position:relative;">
+                        <input type="text" id="sm_branch_search" placeholder="ابحث باسم المحافظة أو الفرع..." style="width:100%; height:50px; padding:0 45px 0 20px; border-radius:14px; border:2px solid #f1f5f9; background:#f8fafc; font-family:'Rubik',sans-serif; outline:none; font-size:15px; font-weight:600; transition:0.3s;" oninput="smFilterBranchesPublic(this.value)">
+                        <span class="dashicons dashicons-search" style="position:absolute; right:15px; top:15px; color:#94a3b8; font-size:20px; width:20px; height:20px;"></span>
                     </div>
                 </div>
             </div>
 
-            <div id="sm-branches-grid-public" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:35px;">
+            <div id="sm-branches-grid-public" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px;">
                 <?php if(empty($branches)): ?>
-                    <div style="grid-column:1/-1; text-align:center; padding:80px 40px; background:#fff; border-radius:30px; border:2px dashed #cbd5e0;">
-                        <div style="font-size:50px; margin-bottom:20px;">📍</div>
-                        <p style="color:#718096; margin:0; font-size:1.2em; font-weight:700;">لا توجد فروع مسجلة في النظام حالياً.</p>
+                    <div style="grid-column:1/-1; text-align:center; padding:60px 30px; background:#fff; border-radius:24px; border:2px dashed #e2e8f0;">
+                        <div style="font-size:40px; margin-bottom:15px;">📍</div>
+                        <p style="color:#718096; margin:0; font-size:1.1em; font-weight:700;">لا توجد فروع مسجلة في النظام حالياً.</p>
                     </div>
                 <?php else: foreach($branches as $b):
                     $logo = $b->logo_url ?: '';
@@ -209,87 +209,87 @@ class SM_Public {
                     $lng = $b->longitude ?: '';
                     $map_query = $lat && $lng ? "$lat,$lng" : urlencode($b->address . ' ' . $b->name);
                 ?>
-                    <div class="sm-branch-card-public sm-card-modern" data-name="<?php echo esc_attr($b->name); ?>" style="background:#fff; border:1px solid #e2e8f0; border-radius:28px; padding:0; box-shadow:0 10px 15px -3px rgba(0,0,0,0.03); transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; display:flex; flex-direction:column; overflow:hidden;">
+                    <div class="sm-branch-card-public sm-card-modern" data-name="<?php echo esc_attr($b->name); ?>" style="background:#fff; border:1px solid #e2e8f0; border-radius:22px; padding:0; box-shadow:0 4px 10px rgba(0,0,0,0.02); transition:all 0.3s ease; position:relative; display:flex; flex-direction:column; overflow:hidden;">
                         <!-- Card Header Accent -->
-                        <div style="height:8px; background:var(--sm-primary-color); width:100%;"></div>
+                        <div style="height:6px; background:var(--sm-primary-color); width:100%;"></div>
 
-                        <div style="padding:35px;">
-                            <div style="display:flex; align-items:start; gap:20px; margin-bottom:25px;">
+                        <div style="padding:25px;">
+                            <div style="display:flex; align-items:start; gap:15px; margin-bottom:20px;">
                                 <?php if($logo): ?>
-                                    <div style="width:70px; height:70px; background:#fff; border-radius:18px; border:1px solid #f1f5f9; padding:8px; box-shadow:0 4px 6px rgba(0,0,0,0.05); flex-shrink:0;">
+                                    <div style="width:55px; height:55px; background:#fff; border-radius:14px; border:1px solid #f1f5f9; padding:6px; box-shadow:0 2px 4px rgba(0,0,0,0.03); flex-shrink:0;">
                                         <img src="<?php echo esc_url($logo); ?>" style="width:100%; height:100%; object-fit:contain;">
                                     </div>
                                 <?php else: ?>
-                                    <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--sm-primary-color) 0%, var(--sm-secondary-color) 100%); border-radius:18px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; font-size:30px;">
-                                        <span class="dashicons dashicons-location" style="font-size:35px; width:35px; height:35px;"></span>
+                                    <div style="width:55px; height:55px; background:linear-gradient(135deg, var(--sm-primary-color) 0%, var(--sm-secondary-color) 100%); border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;">
+                                        <span class="dashicons dashicons-location" style="font-size:28px; width:28px; height:28px;"></span>
                                     </div>
                                 <?php endif; ?>
-                                <div style="flex:1; padding-top:5px;">
-                                    <h3 style="margin:0; font-weight:900; color:var(--sm-dark-color); font-size:1.6em; line-height:1.2;"><?php echo esc_html($b->name); ?></h3>
-                                    <div style="display:inline-flex; align-items:center; gap:6px; background:#f0f4f8; padding:4px 12px; border-radius:10px; margin-top:10px; font-size:11px; font-weight:800; color:#4a5568;">
-                                        <span class="dashicons dashicons-tag" style="font-size:14px; width:14px; height:14px;"></span>
+                                <div style="flex:1; padding-top:2px;">
+                                    <h3 style="margin:0; font-weight:900; color:var(--sm-dark-color); font-size:1.35em; line-height:1.2;"><?php echo esc_html($b->name); ?></h3>
+                                    <div style="display:inline-flex; align-items:center; gap:5px; background:#f0f4f8; padding:3px 10px; border-radius:8px; margin-top:8px; font-size:10px; font-weight:800; color:#4a5568;">
+                                        <span class="dashicons dashicons-tag" style="font-size:12px; width:12px; height:12px;"></span>
                                         كود الفرع: <?php echo esc_html($b->slug); ?>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style="margin-bottom:30px; font-size:14.5px; color:#4a5568; line-height:1.8; min-height:55px;">
-                                <span class="dashicons dashicons-admin-home" style="font-size:18px; margin-left:8px; color:#94a3b8;"></span>
-                                <?php echo esc_html(mb_strimwidth($b->address, 0, 120, "...")); ?>
+                            <div style="margin-bottom:25px; font-size:13.5px; color:#4a5568; line-height:1.7; min-height:45px;">
+                                <span class="dashicons dashicons-admin-home" style="font-size:16px; margin-left:6px; color:#94a3b8;"></span>
+                                <?php echo esc_html(mb_strimwidth($b->address, 0, 100, "...")); ?>
                             </div>
 
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                                <div style="background:#f8fafc; padding:12px; border-radius:15px; border:1px solid #f1f5f9;">
-                                    <div style="font-size:10px; color:#94a3b8; margin-bottom:4px; font-weight:700;">مدير الفرع</div>
-                                    <div style="font-weight:800; color:var(--sm-dark-color); font-size:12px;"><?php echo esc_html($b->manager ?: 'الإدارة العامة'); ?></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div style="background:#f8fafc; padding:10px; border-radius:12px; border:1px solid #f1f5f9;">
+                                    <div style="font-size:9px; color:#94a3b8; margin-bottom:3px; font-weight:700;">مدير الفرع</div>
+                                    <div style="font-weight:800; color:var(--sm-dark-color); font-size:11px;"><?php echo esc_html($b->manager ?: 'الإدارة العامة'); ?></div>
                                 </div>
-                                <div style="background:#f8fafc; padding:12px; border-radius:15px; border:1px solid #f1f5f9;">
-                                    <div style="font-size:10px; color:#94a3b8; margin-bottom:4px; font-weight:700;">حالة التشغيل</div>
-                                    <div style="font-weight:800; color:<?php echo $b->is_active ? '#38a169' : '#e53e3e'; ?>; font-size:12px;">
+                                <div style="background:#f8fafc; padding:10px; border-radius:12px; border:1px solid #f1f5f9;">
+                                    <div style="font-size:9px; color:#94a3b8; margin-bottom:3px; font-weight:700;">حالة التشغيل</div>
+                                    <div style="font-weight:800; color:<?php echo $b->is_active ? '#38a169' : '#e53e3e'; ?>; font-size:11px;">
                                         ● <?php echo $b->is_active ? 'يعمل بكفاءة' : 'متوقف حالياً'; ?>
                                     </div>
                                 </div>
                             </div>
 
-                            <button onclick="smToggleBranchDetails(this)" class="sm-btn sm-btn-outline sm-btn-view-details" style="width:100%; height:55px; margin-top:25px; border-radius:16px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:10px; font-size:15px; border:2px solid #e2e8f0;">
+                            <button onclick="smToggleBranchDetails(this)" class="sm-btn sm-btn-outline sm-btn-view-details" style="width:100%; height:46px; margin-top:20px; border-radius:14px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; border:2px solid #e2e8f0;">
                                 استعراض ملف الفرع <span class="dashicons dashicons-arrow-down-alt2"></span>
                             </button>
 
-                            <div class="sm-branch-details-expanded" style="display:none; margin-top:35px; padding-top:30px; border-top:2px dashed #f1f5f9; animation: smFadeIn 0.4s ease;">
-                                <div style="display:grid; gap:20px;">
-                                    <div style="display:flex; align-items:center; gap:15px; background:#fff; padding:15px; border-radius:18px; border:1px solid #edf2f7; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
-                                        <div style="width:40px; height:40px; background:var(--sm-primary-color)10; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--sm-primary-color);">
-                                            <span class="dashicons dashicons-phone"></span>
+                            <div class="sm-branch-details-expanded" style="display:none; margin-top:25px; padding-top:25px; border-top:1px dashed #e2e8f0; animation: smFadeIn 0.4s ease;">
+                                <div style="display:grid; gap:15px;">
+                                    <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:12px; border-radius:15px; border:1px solid #edf2f7; box-shadow:0 2px 4px rgba(0,0,0,0.01);">
+                                        <div style="width:36px; height:36px; background:rgba(246, 48, 73, 0.08); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--sm-primary-color);">
+                                            <span class="dashicons dashicons-phone" style="font-size:16px;"></span>
                                         </div>
                                         <div>
-                                            <div style="font-size:10px; color:#94a3b8; font-weight:700;">رقم التواصل الموحد</div>
-                                            <div style="font-weight:900; color:var(--sm-dark-color); font-family:monospace;"><?php echo esc_html($b->phone ?: '---'); ?></div>
+                                            <div style="font-size:9px; color:#94a3b8; font-weight:700;">رقم التواصل الموحد</div>
+                                            <div style="font-weight:900; color:var(--sm-dark-color); font-family:monospace; font-size:13px;"><?php echo esc_html($b->phone ?: '---'); ?></div>
                                         </div>
                                     </div>
 
-                                    <div style="display:flex; align-items:center; gap:15px; background:#fff; padding:15px; border-radius:18px; border:1px solid #edf2f7; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
-                                        <div style="width:40px; height:40px; background:var(--sm-primary-color)10; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--sm-primary-color);">
-                                            <span class="dashicons dashicons-email"></span>
+                                    <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:12px; border-radius:15px; border:1px solid #edf2f7; box-shadow:0 2px 4px rgba(0,0,0,0.01);">
+                                        <div style="width:36px; height:36px; background:rgba(246, 48, 73, 0.08); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--sm-primary-color);">
+                                            <span class="dashicons dashicons-email" style="font-size:16px;"></span>
                                         </div>
                                         <div>
-                                            <div style="font-size:10px; color:#94a3b8; font-weight:700;">البريد الإلكتروني</div>
-                                            <div style="font-weight:900; color:var(--sm-dark-color);"><?php echo esc_html($b->email ?: '---'); ?></div>
+                                            <div style="font-size:9px; color:#94a3b8; font-weight:700;">البريد الإلكتروني</div>
+                                            <div style="font-weight:900; color:var(--sm-dark-color); font-size:12px;"><?php echo esc_html($b->email ?: '---'); ?></div>
                                         </div>
                                     </div>
 
                                     <?php if($b->description): ?>
-                                        <div style="background:#fffbeb; padding:20px; border-radius:20px; border:1px solid #fef3c7; font-size:13px; color:#92400e; line-height:1.7;">
+                                        <div style="background:#fffbeb; padding:15px; border-radius:15px; border:1px solid #fef3c7; font-size:12px; color:#92400e; line-height:1.6;">
                                             <strong>نبذة عن الفرع:</strong><br>
                                             <?php echo nl2br(esc_html($b->description)); ?>
                                         </div>
                                     <?php endif; ?>
 
                                     <!-- Location Map Section -->
-                                    <div style="margin-top:10px;">
-                                        <div style="font-weight:900; color:var(--sm-dark-color); margin-bottom:15px; font-size:14px; display:flex; align-items:center; gap:8px;">
-                                            <span class="dashicons dashicons-location-alt" style="color:var(--sm-primary-color);"></span> الموقع الجغرافي للفرع
+                                    <div style="margin-top:5px;">
+                                        <div style="font-weight:900; color:var(--sm-dark-color); margin-bottom:12px; font-size:13px; display:flex; align-items:center; gap:6px;">
+                                            <span class="dashicons dashicons-location-alt" style="color:var(--sm-primary-color); font-size:16px;"></span> الموقع الجغرافي
                                         </div>
-                                        <div style="width:100%; height:250px; border-radius:20px; overflow:hidden; border:1px solid #e2e8f0; background:#f8fafc;">
+                                        <div style="width:100%; height:200px; border-radius:15px; overflow:hidden; border:1px solid #e2e8f0; background:#f8fafc;">
                                             <iframe width="100%" height="100%" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY_HERE&q=<?php echo $map_query; ?>&language=ar" allowfullscreen></iframe>
                                             <!-- Fallback if no API Key is provided (Open Street Map or Simple link) -->
                                             <div id="sm-map-fallback-<?php echo $b->id; ?>" style="display:none; height:100%; align-items:center; justify-content:center; flex-direction:column; gap:10px; padding:20px; text-align:center;">
