@@ -31,6 +31,23 @@ class SM_System_Manager {
         $data = $_POST;
         $id = !empty($data['id']) ? intval($data['id']) : null;
 
+        // Validation Rules
+        if (!empty($data['slug'])) {
+            if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
+                wp_send_json_error(['message' => 'كود الفرع يجب أن يحتوي على حروف إنجليزية صغيرة، أرقام، وشرطات فقط.']);
+            }
+        }
+
+        if (!empty($data['committees'])) {
+            // Ensure committee identifiers are not just symbols
+            $committees = array_map('trim', explode(',', $data['committees']));
+            foreach ($committees as $c) {
+                if (strlen($c) < 2) {
+                    wp_send_json_error(['message' => 'معرف اللجنة "' . $c . '" غير صالح (يجب أن يكون حرفين على الأقل).']);
+                }
+            }
+        }
+
         // Granular Permissions: Branch officers can only edit their own branch
         if ($is_officer && !$can_manage_all) {
             $my_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true);

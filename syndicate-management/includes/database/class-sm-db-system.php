@@ -467,6 +467,7 @@ class SM_DB_System {
             'payment_methods' => !empty($data['payment_methods']) ? json_encode($data['payment_methods']) : '',
             'privacy_settings' => !empty($data['privacy_settings']) ? json_encode($data['privacy_settings']) : '',
             'committees' => sanitize_text_field($data['committees'] ?? ''),
+            'schedule' => !empty($data['schedule']) ? json_encode($data['schedule']) : '',
             'fees' => !empty($data['fees']) ? json_encode($data['fees']) : null,
             'is_active' => isset($data['is_active']) ? 1 : 0
         ];
