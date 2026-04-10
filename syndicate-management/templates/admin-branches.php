@@ -159,6 +159,7 @@ $current_user_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true)
             <button class="sm-branch-tab-btn" onclick="smSwitchBranchTab('banking', this)">البيانات البنكية</button>
             <button class="sm-branch-tab-btn" onclick="smSwitchBranchTab('visibility', this)">الخصوصية والظهور</button>
             <button class="sm-branch-tab-btn" onclick="smSwitchBranchTab('finance', this)">الرسوم والخدمات</button>
+            <button class="sm-branch-tab-btn" onclick="smSwitchBranchTab('schedule', this)">مواعيد العمل</button>
             <button class="sm-branch-tab-btn" onclick="smSwitchBranchTab('location', this); smInitMap();">الموقع الجغرافي</button>
         </div>
 
@@ -225,6 +226,29 @@ $current_user_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true)
                             <option value="restricted">مقيد: يرى بيانات محدودة للأعضاء</option>
                             <option value="open">مفتوح: المسؤول يرى كافة الأعضاء (للفروع الإشرافية)</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Schedule -->
+                <div id="sm-branch-tab-schedule" class="sm-branch-tab-content" style="display:none;">
+                    <div style="background:#f0fff4; border:1px solid #c6f6d5; padding:20px; border-radius:12px; margin-bottom:20px;">
+                        <h5 style="margin:0 0 10px 0; color:#22543d; font-weight:800;">جدول مواعيد العمل الإداري</h5>
+                        <p style="margin:0; font-size:12px; color:#276749;">حدد ساعات العمل الرسمية للفرع ليتم عرضها للأعضاء في البوابة العامة.</p>
+                    </div>
+                    <div style="display:grid; gap:12px;">
+                        <?php
+                        $days_en = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+                        $days_ar = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+                        foreach($days_en as $idx => $day): ?>
+                            <div style="display:flex; align-items:center; gap:15px; background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #e2e8f0;">
+                                <div style="width:80px; font-weight:800; font-size:13px; color:var(--sm-dark-color);"><?php echo $days_ar[$idx]; ?></div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <input type="time" name="schedule[<?php echo $day; ?>][start]" class="sm-input" style="height:35px; width:130px; font-size:12px;">
+                                    <span style="font-weight:900; color:#cbd5e0;">إلى</span>
+                                    <input type="time" name="schedule[<?php echo $day; ?>][end]" class="sm-input" style="height:35px; width:130px; font-size:12px;">
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
@@ -346,6 +370,18 @@ window.smEditBranch = function(b) {
         for (const [k, v] of Object.entries(fees)) {
             const input = f.querySelector(`[name="fees[${k}]"]`);
             if (input) input.value = v;
+        }
+    }
+
+    // Schedule
+    f.querySelectorAll('input[name^="schedule"]').forEach(input => input.value = '');
+    if (b.schedule) {
+        const sched = JSON.parse(b.schedule);
+        for (const [day, times] of Object.entries(sched)) {
+            if (f.querySelector(`[name="schedule[${day}][start]"]`)) {
+                f.querySelector(`[name="schedule[${day}][start]"]`).value = times.start || '';
+                f.querySelector(`[name="schedule[${day}][end]"]`).value = times.end || '';
+            }
         }
     }
 

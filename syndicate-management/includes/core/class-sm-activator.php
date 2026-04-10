@@ -563,6 +563,7 @@ class SM_Activator {
             privacy_settings text,
             fees longtext,
             committees text,
+            schedule text,
             is_active tinyint(1) DEFAULT 1,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
@@ -1278,6 +1279,7 @@ class SM_Activator {
             'privacy_settings' => 'text',
             'fees' => 'longtext',
             'committees' => 'text',
+            'schedule' => 'text',
             'is_active' => 'tinyint(1) DEFAULT 1'
         ];
 
