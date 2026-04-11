@@ -218,7 +218,10 @@ class Syndicate_Management {
 
             // Pioneers Module
             'sm_add_pioneer' => ['SM_Pioneer_Manager', 'ajax_add_pioneer'],
+            'sm_edit_pioneer' => ['SM_Pioneer_Manager', 'ajax_edit_pioneer'],
             'sm_delete_pioneer' => ['SM_Pioneer_Manager', 'ajax_delete_pioneer'],
+            'sm_toggle_pioneer_status' => ['SM_Pioneer_Manager', 'ajax_toggle_pioneer_status'],
+            'sm_get_pioneer_details' => ['SM_Pioneer_Manager', 'ajax_get_pioneer_details'],
 
             // Auth Module
             'sm_update_profile_ajax' => ['SM_Auth', 'ajax_update_profile'],
