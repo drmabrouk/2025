@@ -49,6 +49,8 @@ class Syndicate_Management {
         require_once SM_PLUGIN_DIR . 'includes/database/class-sm-db-certificates.php';
         require_once SM_PLUGIN_DIR . 'includes/database/class-sm-db-research.php';
         require_once SM_PLUGIN_DIR . 'includes/modules/research/class-sm-research-manager.php';
+        require_once SM_PLUGIN_DIR . 'includes/database/class-sm-db-pioneers.php';
+        require_once SM_PLUGIN_DIR . 'includes/modules/system/class-sm-pioneer-manager.php';
 
         // Controllers
         require_once SM_PLUGIN_DIR . 'admin/class-sm-admin.php';
@@ -214,6 +216,10 @@ class Syndicate_Management {
             'sm_toggle_favorite_research' => ['SM_Research_Manager', 'ajax_toggle_favorite'],
             'sm_record_research_interaction' => ['SM_Research_Manager', 'ajax_record_interaction'],
 
+            // Pioneers Module
+            'sm_add_pioneer' => ['SM_Pioneer_Manager', 'ajax_add_pioneer'],
+            'sm_delete_pioneer' => ['SM_Pioneer_Manager', 'ajax_delete_pioneer'],
+
             // Auth Module
             'sm_update_profile_ajax' => ['SM_Auth', 'ajax_update_profile'],
             'sm_clear_site_cache' => ['SM_Auth', 'ajax_clear_site_cache'],
@@ -294,6 +300,7 @@ class Syndicate_Management {
         $this->loader->add_filter('login_redirect', $plugin_public, 'custom_login_redirect', 10, 3);
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('init', $plugin_public, 'register_shortcodes');
+        $this->loader->add_action('init', 'SM_Pioneer_Manager', 'register_shortcodes'); // Using separate reg for now
         $this->loader->add_filter('the_content', $plugin_public, 'append_cover_v2_to_homepage');
         $this->loader->add_action('template_redirect', $plugin_public, 'handle_form_submission');
         $this->loader->add_action('wp_login_failed', $plugin_public, 'login_failed');

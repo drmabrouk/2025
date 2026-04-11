@@ -1024,6 +1024,9 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                     <li class="sm-sidebar-item <?php echo $active_tab == 'research-studies' ? 'sm-active' : ''; ?>">
                         <a href="<?php echo add_query_arg(['sm_tab' => 'research-studies']); ?>" class="sm-sidebar-link"><span class="dashicons dashicons-book-alt"></span> مركز الأبحاث والدراسات</a>
                     </li>
+                    <li class="sm-sidebar-item <?php echo $active_tab == 'pioneers' ? 'sm-active' : ''; ?>">
+                        <a href="<?php echo add_query_arg(['sm_tab' => 'pioneers']); ?>" class="sm-sidebar-link"><span class="dashicons dashicons-medal"></span> رواد المهنة</a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if ($is_admin || $is_general_officer): ?>
@@ -1188,6 +1191,12 @@ $greeting = ($hour >= 5 && $hour < 12) ? 'صباح الخير' : 'مساء ال�
                 case 'research-studies':
                     if ($is_admin || $is_general_officer || $is_branch_officer) {
                         include SM_PLUGIN_DIR . 'templates/admin-research-studies.php';
+                    }
+                    break;
+
+                case 'pioneers':
+                    if ($is_admin || $is_general_officer || $is_branch_officer) {
+                        include SM_PLUGIN_DIR . 'templates/admin-pioneers.php';
                     }
                     break;
 

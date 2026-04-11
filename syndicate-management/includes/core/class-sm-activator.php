@@ -630,6 +630,21 @@ class SM_Activator {
             KEY research_id (research_id)
         ) $charset_collate;\n";
 
+        // Industry Pioneers Table
+        $table_name = $wpdb->prefix . 'sm_pioneers';
+        $sql .= "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            name varchar(255) NOT NULL,
+            photo_url text,
+            specialization varchar(255),
+            bio text,
+            governorate varchar(50),
+            created_by bigint(20) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY name (name)
+        ) $charset_collate;\n";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
@@ -1160,6 +1175,10 @@ class SM_Activator {
             'research-studies' => array(
                 'title' => 'مركز الأبحاث والدراسات',
                 'content' => '[research-studies]'
+            ),
+            'industry-pioneers' => array(
+                'title' => 'رواد المهنة',
+                'content' => '[industry_pioneers]'
             )
         );
 
