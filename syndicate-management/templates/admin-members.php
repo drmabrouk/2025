@@ -13,8 +13,8 @@ if ($import_results) {
 <div class="sm-content-wrapper" dir="rtl">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 20px;">
         <div>
-            <h2 style="margin:0; font-weight: 800; color: var(--sm-dark-color);">إدارة الأعضاء وطلبات القيد</h2>
-            <p style="margin:5px 0 0 0; color:#64748b; font-size:13px;">إدارة بيانات الأعضاء المسجلين، طباعة البطاقات، وعمليات الاستيراد الجماعي.</p>
+            <h2 style="margin:0; font-weight: 800; color: var(--sm-dark-color);">بوابة إدارة الأعضاء وطلبات القيد</h2>
+            <p style="margin:5px 0 0 0; color:#64748b; font-size:13px;">التحكم الكامل في سجلات الأعضاء، إصدار البطاقات، وتدقيق طلبات العضوية.</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
             <?php if (!$is_deleted_view && SM_Settings::can_role_access(reset(wp_get_current_user()->roles), 'add_member')): ?>

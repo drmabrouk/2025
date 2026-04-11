@@ -46,12 +46,12 @@ $can_apply_facility = (in_array($member->professional_grade, ['specialist', 'con
             </div>
         </div>
 
-        <!-- Facility License -->
+        <!-- Facility Permit -->
         <div class="sm-card" style="background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                 <div>
-                    <h3 style="margin: 0; font-weight: 800; color: #1e293b;">تراخيص المنشآت</h3>
-                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #64748b;">رخصة المنشأة أو الأكاديمية الرياضية</p>
+                    <h3 style="margin: 0; font-weight: 800; color: #1e293b;">تصاريح وتراخيص المنشآت</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #64748b;">رخصة المنشأة أو الأكاديمية الرياضية المعتمدة</p>
                 </div>
                 <?php
                 $fac_valid = ($member->facility_license_expiration_date && $member->facility_license_expiration_date >= date('Y-m-d'));

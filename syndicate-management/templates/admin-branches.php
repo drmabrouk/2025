@@ -29,7 +29,7 @@ $current_user_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true)
             ['label' => 'إجمالي الفروع', 'value' => $mgmt_stats['total_branches'], 'icon' => 'dashicons-location', 'color' => '#3182ce'],
             ['label' => 'الأعضاء (كافة الفروع)', 'value' => $mgmt_stats['total_members'], 'icon' => 'dashicons-admin-users', 'color' => '#38a169'],
             ['label' => 'تصاريح مزاولة المهنة', 'value' => $mgmt_stats['total_practice_licenses'], 'icon' => 'dashicons-id-alt', 'color' => '#e67e22'],
-            ['label' => 'تراخيص المنشآت', 'value' => $mgmt_stats['total_facility_licenses'], 'icon' => 'dashicons-building', 'color' => '#e53e3e'],
+            ['label' => 'تصاريح وتراخيص المنشآت', 'value' => $mgmt_stats['total_facility_licenses'], 'icon' => 'dashicons-building', 'color' => '#e53e3e'],
         ];
         foreach ($stat_items as $s):
             $icon = $s['icon']; $label = $s['label']; $value = $s['value']; $color = $s['color'];
@@ -114,7 +114,7 @@ $current_user_gov = get_user_meta(get_current_user_id(), 'sm_governorate', true)
                             <div style="font-size: 13px; font-weight: 800; color: var(--sm-dark-color);"><?php echo number_format($b_stats['total_members']); ?></div>
                         </div>
                         <div style="text-align: center; border-right: 1px solid #e2e8f0; border-left: 1px solid #e2e8f0;">
-                            <div style="font-size: 9px; color: #94a3b8; font-weight: 700; margin-bottom: 2px;">تراخيص</div>
+                            <div style="font-size: 9px; color: #94a3b8; font-weight: 700; margin-bottom: 2px;">تصاريح</div>
                             <div style="font-size: 13px; font-weight: 800; color: var(--sm-dark-color);"><?php echo number_format($b_stats['total_practice_licenses']); ?></div>
                         </div>
                         <div style="text-align: center;">
