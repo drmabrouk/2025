@@ -481,12 +481,12 @@ function smExitTest() {
     $icon = 'dashicons-groups'; $label = 'إجمالي الأعضاء'; $value = number_format($stats['total_members'] ?? 0); $color = '#3182ce'; $url = add_query_arg('sm_tab', 'members');
     include SM_PLUGIN_DIR . 'templates/component-stat-card.php';
 
-    // Stat Box 2: Practice Licenses
+    // Stat Box 2: Practice Permits
     $icon = 'dashicons-id-alt'; $label = 'تصاريح مزاولة المهنة'; $value = number_format($stats['total_practice_licenses'] ?? 0); $color = '#dd6b20'; $url = add_query_arg('sm_tab', 'practice-licenses');
     include SM_PLUGIN_DIR . 'templates/component-stat-card.php';
 
-    // Stat Box 3: Facility Licenses
-    $icon = 'dashicons-building'; $label = 'تراخيص المنشآت'; $value = number_format($stats['total_facility_licenses'] ?? 0); $color = '#805ad5'; $url = add_query_arg('sm_tab', 'facility-licenses');
+    // Stat Box 3: Facility Permits
+    $icon = 'dashicons-building'; $label = 'تصاريح وتراخيص المنشآت'; $value = number_format($stats['total_facility_licenses'] ?? 0); $color = '#805ad5'; $url = add_query_arg('sm_tab', 'facility-licenses');
     include SM_PLUGIN_DIR . 'templates/component-stat-card.php';
 
     // Stat Box 4: Revenue

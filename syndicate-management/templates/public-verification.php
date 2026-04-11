@@ -27,8 +27,8 @@ $show_facility = get_option('sm_verify_show_facility', 1);
                         <option value="auto">🔍 كشف تلقائي ذكي</option>
                         <option value="national_id">🆔 الرقم القومي</option>
                         <option value="membership">💳 رقم القيد النقابي</option>
-                        <option value="practice">📜 ترخيص مزاولة المهنة</option>
-                        <option value="facility">🏠 ترخيص المنشأة</option>
+                        <option value="practice">📜 تصريح مزاولة المهنة</option>
+                        <option value="facility">🏠 تصريح المنشأة</option>
                         <option value="certificate">🎓 شهادات ودورات تدريبية</option>
                         <option value="tracking">📦 كود تتبع الطلبات</option>
                     </select>
@@ -289,7 +289,7 @@ $show_facility = get_option('sm_verify_show_facility', 1);
         if (groups.profile.length > 0) renderSection('الهوية المهنية', groups.profile.map(b => getProfileCard(b.owner)));
         if (groups.membership.length > 0 && config.show_membership) renderSection('السجل النقابي', groups.membership.map(b => getMembershipCard(b.membership)));
         if (groups.practice.length > 0 && config.show_practice) renderSection('تصاريح مزاولة المهنة', groups.practice.map(b => getPracticeCard(b.practice)));
-        if (groups.facility.length > 0 && config.show_facility) renderSection('تراخيص المنشآت', groups.facility.map(b => getFacilityCard(b.facility)));
+        if (groups.facility.length > 0 && config.show_facility) renderSection('تصاريح وتراخيص المنشآت', groups.facility.map(b => getFacilityCard(b.facility)));
         if (groups.certificate.length > 0) renderSection('شهادات ودورات معتمدة', groups.certificate.map(b => getCertificateCard(b.certificate)));
         if (groups.tracking.length > 0) renderSection('الطلبات الرقمية', groups.tracking.map(b => getTrackingCard(b.tracking)));
 
@@ -363,10 +363,10 @@ $show_facility = get_option('sm_verify_show_facility', 1);
     function getPracticeCard(p) {
         const v = !p.expiry || p.expiry === '---' || new Date(p.expiry) >= new Date();
         return `<div class="sm-verify-card">
-            <div class="sm-verify-card-header"><div class="sm-verify-card-label">ترخيص مزاولة المهنة</div><div class="sm-badge-status ${v ? 'sm-badge-success' : 'sm-badge-danger'}">${v ? 'ترخيص سارٍ' : 'ترخيص منتهٍ'}</div></div>
+            <div class="sm-verify-card-header"><div class="sm-verify-card-label">تصريح مزاولة المهنة</div><div class="sm-badge-status ${v ? 'sm-badge-success' : 'sm-badge-danger'}">${v ? 'تصريح سارٍ' : 'تصريح منتهٍ'}</div></div>
             <div class="sm-verify-card-body">
-                <div class="sm-result-item-compact"><span class="sm-result-key">رقم الترخيص المعتمد</span><span class="sm-result-val" style="font-size: 1.1em;">${p.number}</span></div>
-                <div class="sm-result-item-compact"><span class="sm-result-key">تاريخ إصدار الترخيص</span><span class="sm-result-val">${p.issue_date || '---'}</span></div>
+                <div class="sm-result-item-compact"><span class="sm-result-key">رقم التصريح المعتمد</span><span class="sm-result-val" style="font-size: 1.1em;">${p.number}</span></div>
+                <div class="sm-result-item-compact"><span class="sm-result-key">تاريخ إصدار التصريح</span><span class="sm-result-val">${p.issue_date || '---'}</span></div>
                 <div class="sm-result-item-compact"><span class="sm-result-key">تاريخ انتهاء الصلاحية</span><span class="sm-result-val">${p.expiry || '---'}</span></div>
             </div>
         </div>`;
@@ -374,10 +374,10 @@ $show_facility = get_option('sm_verify_show_facility', 1);
 
     function getFacilityCard(f) {
         return `<div class="sm-verify-card">
-            <div class="sm-verify-card-header"><div class="sm-verify-card-label">بيانات ترخيص المنشأة</div><div class="sm-badge-status sm-badge-success">منشأة مرخصة</div></div>
+            <div class="sm-verify-card-header"><div class="sm-verify-card-label">بيانات تصريح المنشأة</div><div class="sm-badge-status sm-badge-success">منشأة مرخصة</div></div>
             <div class="sm-verify-card-body">
                 <div class="sm-result-item-compact" style="border-bottom:1px solid #f1f5f9; padding-bottom:12px; margin-bottom:8px;"><span class="sm-result-key">اسم المنشأة الرياضية</span><span class="sm-result-val" style="font-size: 1.1em; color: var(--sm-primary-color);">${f.name}</span></div>
-                <div class="sm-result-item-compact"><span class="sm-result-key">رقم ترخيص المنشأة</span><span class="sm-result-val">${f.number}</span></div>
+                <div class="sm-result-item-compact"><span class="sm-result-key">رقم تصريح المنشأة</span><span class="sm-result-val">${f.number}</span></div>
                 <div class="sm-result-item-compact"><span class="sm-result-key">الفئة التصنيفية للمنشأة</span><span class="sm-result-val">${f.category}</span></div>
                 <div style="margin-top:12px;"><span class="sm-result-key" style="display:block; margin-bottom:4px;">العنوان المسجل</span><span class="sm-result-val" style="font-size:11px; line-height:1.6; display:block;">${f.address}</span></div>
             </div>

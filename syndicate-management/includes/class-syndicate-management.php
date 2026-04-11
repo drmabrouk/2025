@@ -118,7 +118,7 @@ class Syndicate_Management {
             'sm_export_finance_report' => ['SM_Finance_Manager', 'ajax_export_finance_report'],
             'sm_print_invoice' => ['SM_Finance_Manager', 'ajax_print_invoice'],
 
-            // Licenses Module
+            // Permits Module
             'sm_update_license_ajax' => ['SM_License_Manager', 'ajax_update_license'],
             'sm_update_facility_ajax' => ['SM_License_Manager', 'ajax_update_facility'],
             'sm_soft_delete_facility' => ['SM_License_Manager', 'ajax_soft_delete_facility'],
@@ -153,7 +153,7 @@ class Syndicate_Management {
             'sm_add_ticket_reply' => ['SM_Messaging_Manager', 'ajax_add_ticket_reply'],
             'sm_close_ticket' => ['SM_Messaging_Manager', 'ajax_close_ticket'],
 
-            // Education Module
+            // Examinations Module
             'sm_add_survey' => ['SM_Education_Manager', 'ajax_add_survey'],
             'sm_update_survey' => ['SM_Education_Manager', 'ajax_update_survey'],
             'sm_add_test_question' => ['SM_Education_Manager', 'ajax_add_test_question'],

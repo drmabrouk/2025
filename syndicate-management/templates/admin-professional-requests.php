@@ -16,7 +16,7 @@ $requests = SM_DB::get_professional_requests($args);
 
 <div class="sm-professional-requests-wrap">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h4 style="margin: 0; font-weight: 800; color: var(--sm-dark-color);">طلبات الترقية وتراخيص الممارسة المهنية</h4>
+        <h4 style="margin: 0; font-weight: 800; color: var(--sm-dark-color);">طلبات الترقية وتصاريح الممارسة المهنية</h4>
         <div style="display: flex; gap: 10px;">
             <select onchange="window.location.href='<?php echo add_query_arg('status', '', remove_query_arg('status')); ?>&status=' + this.value" class="sm-select" style="width: auto; height: 38px; font-size: 13px;">
                 <option value="pending" <?php selected($status, 'pending'); ?>>قيد المراجعة</option>
