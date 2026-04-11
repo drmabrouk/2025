@@ -635,14 +635,19 @@ class SM_Activator {
         $sql .= "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             name varchar(255) NOT NULL,
+            slug varchar(255) NOT NULL,
             photo_url text,
             specialization varchar(255),
-            bio text,
+            experience text,
+            achievements text,
+            bio longtext,
             governorate varchar(50),
+            status enum('active', 'inactive') DEFAULT 'active',
             created_by bigint(20) NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             PRIMARY KEY  (id),
-            UNIQUE KEY name (name)
+            UNIQUE KEY name (name),
+            UNIQUE KEY slug (slug)
         ) $charset_collate;\n";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -664,6 +669,7 @@ class SM_Activator {
         self::fix_prof_requests_schema();
         self::fix_certificates_schema();
         self::fix_research_schema();
+        self::fix_pioneers_schema();
         self::setup_roles();
         self::seed_notification_templates();
         self::seed_publishing_templates();
@@ -671,6 +677,7 @@ class SM_Activator {
         self::seed_admin_account();
         self::seed_default_research();
         self::initialize_system_emails();
+        flush_rewrite_rules();
     }
 
     private static function seed_default_research() {
@@ -745,6 +752,35 @@ class SM_Activator {
             if (empty($exists)) {
                 $wpdb->query("ALTER TABLE $table_name ADD $col $type");
             }
+        }
+    }
+
+    private static function fix_pioneers_schema() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'sm_pioneers';
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) return;
+
+        $cols = [
+            'slug' => 'varchar(255) NOT NULL AFTER name',
+            'experience' => 'text AFTER specialization',
+            'achievements' => 'text AFTER experience',
+            'status' => "enum('active', 'inactive') DEFAULT 'active' AFTER governorate"
+        ];
+
+        foreach ($cols as $col => $type) {
+            $exists = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM $table_name LIKE %s", $col));
+            if (empty($exists)) {
+                $wpdb->query("ALTER TABLE $table_name ADD $col $type");
+            }
+        }
+
+        $wpdb->query("ALTER TABLE $table_name MODIFY bio longtext");
+
+        // Ensure slugs exist for old records
+        $pioneers = $wpdb->get_results("SELECT id, name FROM $table_name WHERE slug = ''");
+        foreach($pioneers as $p) {
+            $slug = sanitize_title($p->name);
+            $wpdb->update($table_name, ['slug' => $slug], ['id' => $p->id]);
         }
     }
 
