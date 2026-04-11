@@ -16,9 +16,14 @@ $pioneers = SM_DB_Pioneers::get_pioneers([
                 <h2 style="margin:0; font-weight:900; color:var(--sm-dark-color); font-size:1.6em;">إدارة رواد المهنة</h2>
                 <p style="color:#64748b; margin-top:5px; font-size:13px;">تخصيص لوحة الشرف المعتمدة للمتميزين والمبدعين في المجال</p>
             </div>
-            <button onclick="smOpenPioneerWizard()" class="sm-btn" style="width:auto; height:50px; padding:0 30px; font-weight:800; border-radius:12px; background:linear-gradient(135deg, var(--sm-primary-color) 0%, #d32f2f 100%); box-shadow:0 10px 15px rgba(246, 48, 73, 0.25);">
-                <span class="dashicons dashicons-plus-alt" style="margin-top:4px;"></span> إضافة رائد جديد للمنصة
-            </button>
+            <div style="display:flex; gap:10px;">
+                <a href="<?php echo home_url('/industry-pioneers'); ?>" target="_blank" class="sm-btn sm-btn-outline" style="width:auto; height:42px; padding:0 20px; font-weight:700; border-radius:10px; display:flex; align-items:center; text-decoration:none; border-color:#cbd5e0; color:#4a5568;">
+                    <span class="dashicons dashicons-external" style="margin-left:8px; font-size:18px;"></span> عرض بوابة الرواد
+                </a>
+                <button onclick="smOpenPioneerWizard()" class="sm-btn" style="width:auto; height:42px; padding:0 25px; font-weight:800; border-radius:10px; background:var(--sm-primary-color); box-shadow:none;">
+                    <span class="dashicons dashicons-plus-alt" style="margin-top:4px;"></span> إضافة رائد جديد
+                </button>
+            </div>
         </div>
 
         <!-- Advanced Search Engine -->
@@ -96,11 +101,12 @@ $pioneers = SM_DB_Pioneers::get_pioneers([
                         </td>
                         <td style="text-align:left;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                <button onclick="smEditPioneer(<?php echo $p->id; ?>)" class="sm-btn sm-btn-outline" style="padding:6px 12px; font-size:11px; font-weight:800; border-color:#cbd5e0;">تعديل البيانات</button>
+                                <a href="<?php echo esc_url(home_url('/p/' . $p->slug)); ?>" target="_blank" class="sm-btn sm-btn-outline" style="padding:6px 12px; font-size:11px; font-weight:800; border-color:#cbd5e0; text-decoration:none; display:inline-flex; align-items:center;">عرض الملف</a>
+                                <button onclick="smEditPioneer(<?php echo $p->id; ?>)" class="sm-btn sm-btn-outline" style="padding:6px 12px; font-size:11px; font-weight:800; border-color:#cbd5e0;">تعديل</button>
                                 <button onclick="smTogglePioneerStatus(<?php echo $p->id; ?>)" class="sm-btn" style="padding:6px 12px; font-size:11px; font-weight:800; background:<?php echo $p->status === 'active' ? '#718096' : '#38a169'; ?>;">
-                                    <?php echo $p->status === 'active' ? 'إخفاء من الموقع' : 'إظهار للعامة'; ?>
+                                    <?php echo $p->status === 'active' ? 'إخفاء' : 'إظهار'; ?>
                                 </button>
-                                <button onclick="smDeletePioneer(<?php echo $p->id; ?>)" class="sm-btn" style="padding:6px 12px; font-size:11px; font-weight:800; background:#e53e3e;">حذف نهائي</button>
+                                <button onclick="smDeletePioneer(<?php echo $p->id; ?>)" class="sm-btn" style="padding:6px 12px; font-size:11px; font-weight:800; background:#e53e3e;">حذف</button>
                             </div>
                         </td>
                     </tr>
@@ -228,11 +234,15 @@ $pioneers = SM_DB_Pioneers::get_pioneers([
                 </div>
             </div>
 
-            <div style="background:#f8fafc; padding:25px 40px; border-top:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                <button type="button" id="wizard-prev-btn" onclick="smWizardPrev()" class="sm-btn sm-btn-outline" style="width:auto; padding:0 30px; display:none;">&larr; السابق</button>
+            <div style="background:#f8fafc; padding:25px 40px; border-top:1px solid #eee; display:flex; align-items:center; min-height:100px;">
+                <div style="width:150px;">
+                    <button type="button" id="wizard-prev-btn" onclick="smWizardPrev()" class="sm-btn sm-btn-outline" style="width:100%; padding:0; height:45px; display:none; font-weight:800;">&larr; الخطوة السابقة</button>
+                </div>
                 <div style="flex:1;"></div>
-                <button type="button" id="wizard-next-btn" onclick="smWizardNext()" class="sm-btn" style="width:auto; padding:0 40px; background:var(--sm-dark-color);">التالي &rarr;</button>
-                <button type="submit" id="wizard-submit-btn" class="sm-btn" style="width:auto; padding:0 50px; display:none; background:#38a169;">نشر وتثبيت في لوحة الشرف</button>
+                <div style="width:200px;">
+                    <button type="button" id="wizard-next-btn" onclick="smWizardNext()" class="sm-btn" style="width:100%; padding:0; height:45px; background:var(--sm-dark-color); font-weight:800;">الخطوة التالية &rarr;</button>
+                    <button type="submit" id="wizard-submit-btn" class="sm-btn" style="width:100%; padding:0; height:45px; display:none; background:#38a169; font-weight:800;">نشر وتثبيت في لوحة الشرف</button>
+                </div>
             </div>
         </form>
     </div>

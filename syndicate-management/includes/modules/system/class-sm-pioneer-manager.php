@@ -7,14 +7,19 @@ class SM_Pioneer_Manager {
     public static function register_shortcodes() {
         add_shortcode('industry_pioneers', [__CLASS__, 'shortcode_industry_pioneers']);
 
-        add_action('init', function() {
-            add_rewrite_rule('^industry-pioneers/([^/]+)/?', 'index.php?pagename=industry-pioneers&pioneer_slug=$matches[1]', 'top');
-        });
+        // Shortened URL structure: /p/slug instead of /industry-pioneers/slug
+        add_rewrite_rule('^p/([^/]+)/?', 'index.php?pagename=industry-pioneers&pioneer_slug=$matches[1]', 'top');
 
         add_filter('query_vars', function($vars) {
             $vars[] = 'pioneer_slug';
             return $vars;
         });
+
+        // Ensure rewrite rules are flushed if they were just added
+        if (get_option('sm_pioneers_rewrite_flushed') !== SM_VERSION) {
+            flush_rewrite_rules();
+            update_option('sm_pioneers_rewrite_flushed', SM_VERSION);
+        }
     }
 
     public static function ajax_add_pioneer() {
@@ -129,7 +134,7 @@ class SM_Pioneer_Manager {
 
             <div id="sm-pioneers-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:35px;">
                 <?php foreach($pioneers as $p): ?>
-                    <div class="sm-pioneer-card" data-name="<?php echo esc_attr($p->name); ?>" data-spec="<?php echo esc_attr($p->specialization); ?>" data-gov="<?php echo esc_attr($p->governorate); ?>" style="background:#fff; border:1px solid #e2e8f0; border-radius:24px; overflow:hidden; transition:0.4s ease; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 20px 30px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.02)';" onclick="location.href='<?php echo esc_url(home_url('/industry-pioneers/' . $p->slug)); ?>'">
+                    <div class="sm-pioneer-card" data-name="<?php echo esc_attr($p->name); ?>" data-spec="<?php echo esc_attr($p->specialization); ?>" data-gov="<?php echo esc_attr($p->governorate); ?>" style="background:#fff; border:1px solid #e2e8f0; border-radius:24px; overflow:hidden; transition:0.4s ease; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 20px 30px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.02)';" onclick="location.href='<?php echo esc_url(home_url('/p/' . $p->slug)); ?>'">
                         <div style="height:240px; background:#f8fafc; overflow:hidden; position:relative;">
                             <?php if($p->photo_url): ?>
                                 <img src="<?php echo esc_url($p->photo_url); ?>" style="width:100%; height:100%; object-fit:cover;">
@@ -297,7 +302,7 @@ class SM_Pioneer_Manager {
                         <span class="dashicons dashicons-arrow-right-alt2" style="background:#f1f5f9; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;"></span> العودة لدليل الرواد
                     </a>
                     <div style="display:flex; gap:15px;">
-                        <button onclick="smSharePioneer('<?php echo esc_url(home_url('/industry-pioneers/' . $p->slug)); ?>')" class="sm-btn" style="width:auto; padding:0 35px; background:#3182ce; height:50px; font-weight:800; border-radius:15px; box-shadow:0 10px 20px rgba(49, 130, 206, 0.2);">
+                        <button onclick="smSharePioneer('<?php echo esc_url(home_url('/p/' . $p->slug)); ?>')" class="sm-btn" style="width:auto; padding:0 35px; background:#3182ce; height:50px; font-weight:800; border-radius:15px; box-shadow:0 10px 20px rgba(49, 130, 206, 0.2);">
                             <span class="dashicons dashicons-share" style="margin-top:4px;"></span> مشاركة الملف الشخصي
                         </button>
                     </div>
